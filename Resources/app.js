@@ -1,51 +1,94 @@
+const Global = require('global');
+const FlipModule = require('de.manumaticx.androidflip');
 ! function() {
-	
-	
-	//require('controls/earlybird.adapter')();
-	var Moment = require('vendor/moment');
-	//require('controls/wurfsendung.import')(240);
-	var self = Ti.UI.createTabGroup({
-		fullscreen : true,
-		swipeable : false,
-		exitOnClose : true,
-		smoothScrollOnTabClick : true,
-		orientationModes : [Ti.UI.PORTRAIT, Ti.UI.UPSIDE_PORTRAIT],
-		tabs : [Ti.UI.createTab({
-			title : 'Mediathek',
-			ndx : 0,
-			window : require('ui/mediathek.window')()
-		}), Ti.UI.createTab({
-			title : 'Podcasts',
-			ndx : 1,
-		})]
-	});
-	self.addEventListener('open', require('ui/streamer.menu'));
 
-	['podcasttiles'].forEach(function(win, ndx) {
-		setTimeout(function() {
-			self.tabs[ndx + 1].setWindow(require('ui/'+ win+ '.window')());
-		}, ndx * 5000);
-	});
-	setInterval(function() {
-		var today = Moment().format('YYYYMMDD');
-		var lastday = Ti.App.Properties.getString('LASTDAY', '');
-		if (lastday != today) {
-			Ti.App.Properties.setString('LASTDAY', today);
-			Ti.App.fireEvent('daychanged');
-		}
-	}, 1000 * 60);
-	self.open();
-	self.setActiveTab(0);
-	var tools = require('bencoding.android.tools');
-	require('vendor/cronservice.trigger')();
-	self.addEventListener("android:back", function(_e) {//listen for the back-button-tap event
-		_e.cancelBubble = true;
-		var intent = Ti.Android.createIntent({
-			action : Ti.Android.ACTION_MAIN,
-			flags : Ti.Android.FLAG_ACTIVITY_NEW_TASK
-		});
-		intent.addCategory(Ti.Android.CATEGORY_HOME);
-		Ti.Android.currentActivity.startActivity(intent);
-		return false;
-	});
+    const $ = Ti.UI.createWindow({
+        fullscreen : true
+    });
+
+    $.createAndStartPlayer = function(_args) {
+        var start = new Date().getTime();
+        var PlayerOverlay = require('ui/audioplayer.window').createAndStartPlayer(_args);
+        /* $.add(PlayerOverlay);
+         PlayerOverlay.oncomplete = function() {
+         try {
+         $.remove(PlayerOverlay);
+         PlayerOverlay = null;
+         } catch(E) {
+         console.log(E);
+         }
+         };*/
+        console.log('Info: constructTime for player: ' + (new Date().getTime() - start));
+    };
+    $.addEventListener('open',() => {
+        Global.АктйонБар.title = "DeutschlandRadio Mediathek";
+        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+        Global.АктйонБар.titleFont = "ScalaSansBold";
+        Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
+        Global.АктйонБар.subtitleColor = "#eee";
+         
+        $.activity.actionBar.displayHomeAsUp = true;
+        $.activity.actionBar.onHomeIconItemSelected = function() {
+                $.Drawer.toggleLeft();
+        };
+        $.activity.onCreateOptionsMenu = function(_menuevent) {
+            _menuevent.menu.clear();
+            _menuevent.menu.add({
+                title : 'Start live Radio',
+                itemId : 1,
+                icon : Ti.App.Android.R.drawable['ic_action_play'],
+                showAsAction : Ti.Android.SHOW_AS_ACTION_IF_ROOM,
+            }).addEventListener("click", function() {
+                const station = {
+                    name : Global.Stations[Global.currentStation].name,
+                    color : Global.Stations[Global.currentStation].color,
+                    stream : Global.Stations[Global.currentStation].stream,
+                    station : Global.currentStation
+                };
+                require('liveradio/radioplayer.window')(station).open();
+            });
+        };
+        var pages = [];
+        for (var station in Global.Stations) {
+            const opts = {
+                station : station,
+                window : $,
+                color : Global.Stations[station].color,
+                mediathek : Global.Stations[station].mediathek,
+            };
+            if (station != 'drw')
+                pages.push(require('ui/mediathek.page')(opts));
+            else
+                pages.push(require('ui/nova/index.page')(opts));
+        };
+        $.Drawer = Ti.UI.Android.createDrawerLayout({
+            leftView : require('ui/drawer/drawer.widget')(),
+            centerView : FlipModule.createFlipView({
+                orientation : FlipModule.ORIENTATION_HORIZONTAL,
+                overFlipMode : FlipModule.OVERFLIPMODE_GLOW,
+                views : pages,
+                top : 0,
+                bottom : 0,
+                currentPage : Global.currentPage,
+                height : Ti.UI.FILL
+            })
+        });
+      $.Drawer.centerView.addEventListener('flipped', function(e) {
+            Object.keys(Global.Stations).forEach((k,i) => {
+                if (i == e.index) {
+                    Global.currentStation = k;
+                }
+            });
+            console.log(Global.currentStation);
+            Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+            Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
+            Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+            Global.АктйонБар.statusbarColor = Global.Stations[Global.currentStation].darkcolor;
+            Ti.App.Properties.setString('LAST_STATION', Global.currentStation);
+        });
+        $.Drawer.centerView.flipToView($.Drawer.centerView.views[Global.currentPage]);
+        $.add($.Drawer);
+       
+    });
+    $.open();
 }();

@@ -36,6 +36,7 @@ module.exports = function(args) {
             fontFamily : 'Aller Bold'
         },
     }));
+    /*
     self.addEventListener('click', function(_e) {
         var picker = Ti.UI.createPicker({
             type : Ti.UI.PICKER_TYPE_DATE,
@@ -67,6 +68,6 @@ module.exports = function(args) {
         }
         _e.source.children[0].setText(Moment(parent.date).format('LL'));
         parent.updateMediathekList();
-    });
+    });*/
     return self;
 };

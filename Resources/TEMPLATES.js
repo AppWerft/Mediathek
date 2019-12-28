@@ -293,6 +293,7 @@ exports.mediathek = {
 		bindId : 'start',
 		properties : {
 			left : 5,
+			height : Ti.UI.SIZE,
 			touchEnabled : false,
 			top : 2,
 			color : '#555',
@@ -307,6 +308,7 @@ exports.mediathek = {
 		properties : {
 			opacity : 0.5,
 			left : 5,
+			visible: false,
 			top : 32,
 			bottom : 5,
 			bubbleParent : true,
@@ -320,6 +322,7 @@ exports.mediathek = {
 		properties : {
 			opacity : 0.5,
 			left : 35,
+			visible: false,
 			top : 35,
 			bottom : 5,
 			bubbleParent : true,
@@ -334,6 +337,7 @@ exports.mediathek = {
 			width : Ti.UI.FILL,
 			layout : 'vertical',
 			left : 75,
+			height: Ti.UI.SIZE,
 			right : 25
 		},
 		childTemplates : [{
@@ -347,7 +351,8 @@ exports.mediathek = {
 					fontSize : 20,
 					fontFamily : 'Aller Bold'
 				},
-				color : '#555'
+				color : '#555',
+				height : Ti.UI.SIZE
 			}
 		}, {
 			type : 'Ti.UI.Label',
@@ -471,7 +476,7 @@ exports.merkliste = {
 				touchEnabled : false,
 				font : {
 					fontSize : 18,
-					fontFamily : 'Aller Bold'
+					fontFamily : 'Aller     Bold'
 				},
 				color : '#555'
 			}
@@ -957,4 +962,168 @@ exports.recents = {
 			}
 		}]
 	}]
+};
+
+exports.nova = {
+    properties : {
+        height : Ti.UI.SIZE
+    },
+    childTemplates : [{
+        type : 'Ti.UI.View',
+        bindId : "button",
+        properties : {
+            top : 0,
+            right : 0,
+            borderWidth : 1,
+            borderColor : "orange",
+            height : 50,
+            width : 100,
+            backgroundColor : '#8801953C',
+            touchEnabled : true
+        }
+    }, {
+        type : 'Ti.UI.ImageView',
+        bindId : 'image',
+        properties : {
+            touchEnabled : false,
+            top : 0,
+            width : Ti.UI.FILL,
+            height : 'auto',
+        }
+    }, {
+        type : 'Ti.UI.ImageView',
+        bindId : 'share',
+        properties : {
+            touchEnabled : true,
+            top : 0,
+            bindId : 'share',
+            left : 0,
+            image : "/images/share_drw.png",
+            width : 50,
+            height : 71,
+            opacity:0.6
+        }
+    }, {
+        type : 'Ti.UI.Label',
+        bindId : 'play',
+        properties : {
+            width : Ti.UI.SIZE,
+            bindId : 'play',
+            height : Ti.UI.SIZE,
+            color : require("model/stations").drw.color,
+            touchEnabled : false,
+            opacity : 0.5,
+            text : "▶︎",
+            font : {
+                fontSize : 64
+            }
+        }
+    }, {
+        type : 'Ti.UI.View',
+        bindId : "strip",
+        properties : {
+            bottom : 0,
+            right : 0,
+            touchEnabled : true,
+            height : Ti.UI.SIZE,
+            backgroundColor : '#8801953C'
+        },
+        childTemplates : [{
+            type : 'Ti.UI.Label',
+            bindId : 'title',
+            properties : {
+                left : 10,
+                bottom : 5,
+                textAlign : "left",
+                color : '#fff',
+                touchEnabled : false,
+                right : 5,
+                 height : Ti.UI.SIZE,
+                font : {
+                    fontSize : 22,
+                    fontFamily : 'ScalaSansBold'
+                }
+            }
+
+        }]
+    }, {
+        type : 'Ti.UI.Label',
+        bindId : 'sendung',
+        properties : {
+            right : 0,
+            top : 0,
+            color : '#dfff',
+            touchEnabled : false,
+            backgroundColor : "#000",
+            right : 0,
+            font : {
+                fontSize : 18,
+                fontFamily : 'ScalaSans'
+            }
+        }
+    }]
+};
+
+exports.novathema = {
+    properties : {
+        height : Ti.UI.SIZE,
+    },
+    childTemplates : [{
+        type : 'Ti.UI.View',
+        bindId : "button",
+        bubbleParent : false,
+        properties : {
+            top : 0,
+            right : 0,
+            height : 150,
+            width : 200,
+            backgroundColor : '#8801953C',
+            touchEnabled : true
+        }
+    }, {
+        type : 'Ti.UI.ImageView',
+        bindId : 'image',
+        properties : {
+            touchEnabled : false,
+            top : 0,
+            width : Ti.UI.FILL,
+            height : 'auto',
+        }
+    }, {
+        type : 'Ti.UI.View',
+        bindId : "strip",
+        properties : {
+            bottom : 0,
+            right : 0,
+            height : Ti.UI.SIZE,
+            width : Ti.UI.FILL,
+            backgroundColor : '#8801953C',
+            touchEnabled : false
+        },
+        childTemplates : [{
+            type : 'Ti.UI.Label',
+            bindId : 'title',
+            properties : {
+                left : 10,
+                bottom : 5,
+                textAlign : "left",
+                color : '#fff',
+                 height : Ti.UI.SIZE,
+                touchEnabled : false,
+                right : 5,
+                font : {
+                    fontSize : 22,
+                    fontFamily : 'ScalaSansBold'
+                }
+            }
+
+        }]
+    }, {
+        type : 'Ti.UI.Label',
+        bindId : 'sendung',
+        properties : {
+            height : 0,
+            touchEnabled : false,
+        }
+    }]
 };

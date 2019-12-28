@@ -1,26 +1,31 @@
 module.exports = {
     dlf : {
         color : '#006AB3',
-        name: 'Deutschlandfunk',
+        darkcolor : '#00338B',
+        
+        name: 'Deutschlandradio',
         /* für Tagesübersicht, wird auch in der Mediathek genutzt und einaml täglich über
          einen Hintergrundprozess gesynct*/
         dayplan: 'http://www.deutschlandfunk.de/programmvorschau.281.de.rss',
         /* für LiveRadio, eigentlicher Stream wird ermittelt und gespeichert*/
-        stream : 'http://www.dradio.de/streaming/dlf.m3u',
+        stream : 'http://st01.dlf.de/dlf/01/128/mp3/stream.mp3',
         /* wird jede Minute aufgerufen, wenn View aktiv ist */
-        mediathek : 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:station_id=4&drau:from=_DATE_&drau:to=_DATE_&drau:page=1&drau:limit=500'
+        mediathek : 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:station_id=4&drau:from=_DATE_&drau:to=_DATE_&drau:page=1&drau:limit=100'
     },
     drk : {
         color : '#E95D0F',
-        name : 'DRadio Kultur',
+        darkcolor : '#A51400',
+        name : 'DLF Kultur',
         dayplan: 'http://www.deutschlandradiokultur.de/programmvorschau.282.de.rss',
-        stream : 'http://www.dradio.de/streaming/dkultur.m3u',
-        mediathek : 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:station_id=3&drau:from=_DATE_&drau:to=_DATE_&drau:page=1&drau:limit=500'
+        stream : 'http://dradio-edge-1093.dus-dtag.cdn.addradio.net/dradio/kultur/live/mp3/128/stream.mp3',
+        mediathek : 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:station_id=3&drau:from=_DATE_&drau:to=_DATE_&drau:page=1&drau:limit=100'
     },
     drw : {
         color : '#01953C',
-        name :'DRadio Wissen',
-        stream : 'http://www.deutschlandradio.de/streaming/dradiowissen.m3u',
+        darkcolor : '#006900',
+        name :'DLF Nova',
+        meta : 'https://www.deutschlandfunknova.de/actions/dradio/playlist/onair',
+        stream : 'http://st03.dlf.de/dlf/03/128/mp3/stream.mp3',
         mediathek : 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:station_id=1&drau:from=_DATE_&drau:to=_DATE_&drau:page=1&drau:limit=500'
     }
 };

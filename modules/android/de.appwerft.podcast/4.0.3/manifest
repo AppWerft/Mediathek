@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 4.0.3
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
+description: Ti Podcast harvester
+author: Rainer Schleevoigt
+license: MIT
+copyright: Copyright (c) 2016 by
+
+# these should not be edited
+name: TiPodcast
+moduleid: de.appwerft.podcast
+guid: a10c44f9-23d1-4f82-ba7e-9ff003f6a169
+platform: android
+minsdk: 7.0.0

@@ -1,0 +1,55 @@
+<h1>Titanium TelephonyManager <a href="http://gitt.io/component/com.goyya.telephonymanager"><img alt="gittio" src="http://img.shields.io/badge/gittio-1.0.0-00B4CC.svg"/></a></h1>
+
+<blockquote><p>Titanium Module for accessing the Android TelephonyManager</p></blockquote>
+
+<h2>Description</h2>
+
+<p>This module exposes the Android <a href="http://developer.android.com/reference/android/telephony/TelephonyManager.html">TelephonyManager</a> to Titanium.</p>
+
+<p>(If you are looking for something similar for iOS you should check out David Bankier&#39;s <a href="https://github.com/dbankier/CoreTelephony-for-Appcelerator-Titanium">CoreTelephony </a> module)</p>
+
+<h2>Quick Start</h2>
+
+<h3>Installation</h3>
+
+<p>Download the latest distribution ZIP-file and consult the <a href="http://docs.appcelerator.com/titanium/latest/#!/guide/Using_a_Module">Titanium Documentation</a> on how install it, or simply use the <a href="http://gitt.io/cli">gitTio CLI</a>:</p>
+
+<p><code>$ gittio install com.goyya.telephonymanager</code></p>
+
+<h3>Usage</h3>
+
+<p>For the full API documentation please see <a href="http://developer.android.com/reference/android/telephony/TelephonyManager.html">here</a></p>
+
+<p><code></code>`javascript
+var telephonymanager = require(&quot;com.goyya.telephonymanager&quot;);</p>
+
+<p>// these are just some infos you can get
+console.log(&#39;callState:             &#39; + telephonymanager.callState);
+console.log(&#39;deviceId:              &#39; + telephonymanager.deviceId);
+console.log(&#39;deviceSoftwareVersion: &#39; + telephonymanager.deviceSoftwareVersion);
+console.log(&#39;phoneNumber:           &#39; + telephonymanager.line1Number);
+console.log(&#39;networkOperator:       &#39; + telephonymanager.networkOperator);
+console.log(&#39;networkOperatorName:   &#39; + telephonymanager.networkOperatorName);
+console.log(&#39;networkType:           &#39; + telephonymanager.networkType);
+console.log(&#39;phoneType:             &#39; + telephonymanager.phoneType);
+console.log(&#39;simOperator:           &#39; + telephonymanager.simOperator);
+console.log(&#39;simOperatorName:       &#39; + telephonymanager.simOperatorName);
+console.log(&#39;simSerialNumber:       &#39; + telephonymanager.simSerialNumber);
+console.log(&#39;simState:              &#39; + telephonymanager.simState);
+console.log(&#39;voiceMailNumber:       &#39; + telephonymanager.voiceMailNumber);
+console.log(&#39;isNetworkRoaming:      &#39; + telephonymanager.isNetworkRoaming);
+console.log(&#39;isSmsCapable:          &#39; + telephonymanager.isSmsCapable);
+console.log(&#39;isVoiceCapable:        &#39; + telephonymanager.isVoiceCapable);
+<code></code>`</p>
+
+<blockquote><p>NOTE: This module automatically adds the <code>READ_PHONE_STATE</code> permission to your manifest. If you are using methods of the TelephonyManager that are requiring any other permission, please add it manually to your tiapp.xml</p></blockquote>
+
+<h2>API Documentation</h2>
+
+<h3>Properties</h3>
+
+<ul><li><code>callState</code> <em>(Number)</em><ul><li><code>CALL_STATE_RINGING</code></li><li><code>CALL_STATE_OFFHOOK</code></li><li><code>CALL_STATE_IDLE</code></li></ul></li><li><code>dataActivity</code> <em>(Number)</em><ul><li><code>DATA_ACTIVITY_NONE</code></li><li><code>DATA_ACTIVITY_IN</code></li><li><code>DATA_ACTIVITY_OUT</code></li><li><code>DATA_ACTIVITY_INOUT</code></li><li><code>DATA_ACTIVITY_DORMANT</code></li></ul></li><li><code>dataState</code> <em>(Number)</em><ul><li><code>DATA_DISCONNECTED</code></li><li><code>DATA_CONNECTING</code></li><li><code>DATA_CONNECTED</code></li><li><code>DATA_SUSPENDED</code></li></ul></li><li><code>deviceId</code> <em>(String)</em></li><li><code>deviceSoftwareVersion</code> <em>(String)</em></li><li><code>groupIdLevel1</code> <em>(String)</em></li><li><code>line1Number</code> <em>(String)</em></li><li><code>mmsUAProfUrl</code> <em>(String)</em></li><li><code>mmsUserAgent</code> <em>(String)</em></li><li><code>networkCountryIso</code> <em>(String)</em></li><li><code>networkOperator</code> <em>(String)</em></li><li><code>networkOperatorName</code> <em>(String)</em></li><li><code>networkType</code> <em>(Number)</em><ul><li><code>NETWORK_TYPE_1xRTT</code></li><li><code>NETWORK_TYPE_CDMA</code></li><li><code>NETWORK_TYPE_EDGE</code></li><li><code>NETWORK_TYPE_EHRPD</code></li><li><code>NETWORK_TYPE_EVDO_0</code></li><li><code>NETWORK_TYPE_EVDO_A</code></li><li><code>NETWORK_TYPE_EVDO_B</code></li><li><code>NETWORK_TYPE_GPRS</code></li><li><code>NETWORK_TYPE_HSDPA</code></li><li><code>NETWORK_TYPE_HSPA</code></li><li><code>NETWORK_TYPE_HSPAP</code></li><li><code>NETWORK_TYPE_HSUPA</code></li><li><code>NETWORK_TYPE_IDEN</code></li><li><code>NETWORK_TYPE_LTE</code></li><li><code>NETWORK_TYPE_UMTS</code></li><li><code>NETWORK_TYPE_UNKNOWN</code></li></ul></li><li><code>phoneType</code> <em>(Number)</em><ul><li><code>PHONE_TYPE_NONE</code></li><li><code>PHONE_TYPE_GSM</code></li><li><code>PHONE_TYPE_CDMA</code></li><li><code>PHONE_TYPE_SIP</code></li></ul></li><li><code>simCountryIso</code> <em>(String)</em></li><li><code>simOperator</code> <em>(String)</em></li><li><code>simOperatorName</code> <em>(String)</em></li><li><code>simSerialNumber</code> <em>(String)</em></li><li><code>simState</code> <em>(Number)</em><ul><li><code>SIM_STATE_UNKNOWN</code></li><li><code>SIM_STATE_ABSENT</code></li><li><code>SIM_STATE_PIN_REQUIRED</code></li><li><code>SIM_STATE_PUK_REQUIRED</code></li><li><code>SIM_STATE_NETWORK_LOCKED</code></li><li><code>SIM_STATE_READY</code></li></ul></li><li><code>subscriberId</code> <em>(String)</em></li><li><code>voiceMailAlphaTag</code> <em>(String)</em></li><li><code>voiceMailNumber</code> <em>(String)</em></li><li><code>hasCarrierPrivileges</code> <em>(Boolean)</em></li><li><code>hasIccCard</code> <em>(Boolean)</em></li><li><code>isNetworkRoaming</code> <em>(Boolean)</em></li><li><code>isSmsCapable</code> <em>(Boolean)</em></li><li><code>isVoiceCapable</code> <em>(Boolean)</em></li></ul>
+
+<h3>Events</h3>
+
+<ul><li><code>callForwardingIndicator</code></li><li><code>callState</code> </li><li><code>cellInfo</code></li><li><code>cellLocation</code></li><li><code>dataActivity</code></li><li><code>dataConnectionState</code></li><li><code>messageWaitingIndicator</code></li><li><code>serviceState</code></li><li><code>signalStrengths</code></li></ul>

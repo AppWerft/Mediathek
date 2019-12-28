@@ -1,12 +1,13 @@
 var Moment = require('vendor/moment'),
     Favs = new (require('controls/favorites.adapter'))();
+const Global = require('global');
 
 module.exports = function(_args) {
-	if (_args.station != Ti.App.Properties.getString('LAST_STATION')) {
+	/*if (_args.station != Global.currentStation) {
 			console.log('Warning: no same station');
 			_args.onload(null);
 			return;
-	}
+	}*/
 	var onloadFunc = function() {
 		var start = new Date().getTime();
 		var entries = require('controls/aodlistaudio.rpc').parseXMLDoc(this.responseXML.documentElement);
@@ -67,7 +68,6 @@ module.exports = function(_args) {
 		onload : onloadFunc
 	});
 	xhr.open('GET', url);
-	console.log(url);
 	xhr.setRequestHeader('User-Agent', 'Das%20DRadio/6 CFNetwork/711.1.16 Darwin/14.0.0');
 	xhr.send();
 };

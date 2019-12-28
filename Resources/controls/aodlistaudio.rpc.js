@@ -1,16 +1,19 @@
 var parseNode = function(itemNode) {
+    console.log(itemNode.toString());
 	var entry = {};
 	var entry = {
 		station : itemNode.getElementsByTagName('station').item(0).getTextContent().toLowerCase(),
 		title : itemNode.getElementsByTagName('title').item(0).getTextContent(),
 		author : itemNode.getElementsByTagName('author').item(0).getTextContent(),
 		sendung : itemNode.getElementsByTagName('sendung').item(0).getTextContent(),
+		
 		datetime : itemNode.getElementsByTagName('datetime').item(0).getTextContent(),
 	};
 	if (itemNode.hasAttributes()) {
-		var attributes = itemNode.getAttributes();
+		const attributes = itemNode.getAttributes();
 		entry.url = attributes.getNamedItem('url') ? attributes.getNamedItem('url').nodeValue : null;
 		entry.duration = attributes.getNamedItem('duration').nodeValue;
+		//    entry.id = attributes..getNamedItem('')
 	}
 	return entry;
 };
