@@ -67,7 +67,7 @@ module.exports = function(_args) {
 					var dataitems = [];
 					sendung.subs.forEach(function(item) {
 						item.title = sendung.name;
-						var FORMAT =  (item.duration<60*60) ? "m:ss": "H:mm:ss";
+						const FORMAT =  (item.duration<60*60*1000) ? "m:ss": "H:mm:ss";
                  		dataitems.push({
 							properties : {
 								accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE,
@@ -87,6 +87,9 @@ module.exports = function(_args) {
 							subtitle : {
 								text : item.subtitle,
 							},
+							deliveryMode : {
+							    image : item.deliveryMode=="stream" ? "/images/hls.png": '/images/mp3.png'
+							},
 							fav : {
 								image : item.isfav ? '/images/fav.png' : '/images/favadd.png',
 								opacity : item.isfav ? 0.8 : 0.5
@@ -100,7 +103,7 @@ module.exports = function(_args) {
 							},
 							duration : {
 								text : (item.duration) ? 'Dauer: ' + 
-								Moment.unix(item.duration).utc().format(FORMAT) : '',
+								Moment(item.duration).utc().format(FORMAT) : '',
 							}
 						});
 					});
@@ -152,6 +155,7 @@ module.exports = function(_args) {
 				duration : data.duration,
 				title : data.title,
 				subtitle : data.subtitle,
+				deliveryMode : data.deliveryMode,
 				author : data.author,
 				station : data.station,
 				pubdate : data.pubdate

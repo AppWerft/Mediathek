@@ -9,8 +9,7 @@ function clean(foo) {
         .replace(/<br>/gm, "")//
         .replace(/Erdogan/gm, "Erdoğan")//
         .replace(/Yildirim/gm, "Yıldırım")//
-        .replace(/Sofuoglu/gm,"Sofuoğlu")
-        .replace(/Cavusoglu/gm, "Çavuşoğlu")//
+        .replace(/Sofuoglu/gm, "Sofuoğlu").replace(/Cavusoglu/gm, "Çavuşoğlu")//
         .replace(/Isik/gm, "Işık")//
         .replace(/Sislik/gm, "Şişlik")//
         .replace(/&amp;/gm, "&")//
@@ -21,16 +20,15 @@ function clean(foo) {
     else
         return "";
 }
+
 function hms2s(str) {
     var p = str.split(':'),
         s = 0,
         m = 1;
-
     while (p.length > 0) {
         s += m * parseInt(p.pop(), 10);
         m *= 60;
     }
-
     return s;
 }
 
@@ -38,7 +36,6 @@ module.exports = function(ndx, slot, cb) {
     //  if (slot != "thema")
     //  slot = "podcasts/download/" + slot;
     var url = 'https://www.deutschlandfunknova.de/' + slot + '/p' + (ndx + 1) + "?" + new Date().getTime();
-    console.log("-----------------\n" + url);
     setTimeout(doRequest, ndx * 5000);
     function doRequest() {
         require('de.appwerft.soup').createDocument({
@@ -78,9 +75,10 @@ module.exports = function(ndx, slot, cb) {
                                 link : link,
                                 thema : thema,
                                 alt : alt,
+                                deliveryMode : 'download',
                                 title : clean(title),
                                 image : image,
-                                duration : duration,
+                                duration : 1000 * duration,
                                 text : clean(text),
                                 color : nova[thema] ? nova[thema].color : "#777777"
                             });
@@ -95,7 +93,7 @@ module.exports = function(ndx, slot, cb) {
                         var alt = item.selectFirst("figure.teaser__image img").getAttribute("alt");
                         var sendung = item.selectFirst("div.kicker").getText();
                         var thema = item.selectFirst("div.kicker").getText();
-                        var text =  item.selectFirst("div.text p").getText();
+                        var text = item.selectFirst("div.text p").getText();
                         var title = item.selectFirst("h3").getText();
                         var link = item.selectFirst("div small a").getAttribute("href");
                         res.push({
@@ -104,6 +102,7 @@ module.exports = function(ndx, slot, cb) {
                             alt : alt,
                             title : clean(title),
                             image : image,
+                            deliveryMode : "download",
                             duration : 0,
                             text : text,
                             color : nova[slot] ? nova[slot].color : "#777777"

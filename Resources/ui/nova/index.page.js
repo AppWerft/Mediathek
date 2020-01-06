@@ -43,6 +43,7 @@ module.exports = function(_args) {
 				title : data.sendung,
 				subtitle : data.title,
 				description : data.text,
+				deliveryMode : data.deliveryMode,
 				station : 'drw',
 				image : data.image,
 				pubdate : data.pubdate || 'unbekannt'
@@ -90,9 +91,6 @@ module.exports = function(_args) {
 	var currentMediathekHash = null;
 	/* hiding of todays display */
 	$.updateMediathekList = function() {
-	   
-		
-		
 		for (var ndx = 0; ndx < PAGES; ndx++) {
 			require('controls/nova/adapter')(ndx, "thema", function(_sendungen, _ndx) {
 				//$.refreshView.setRefreshing(false);

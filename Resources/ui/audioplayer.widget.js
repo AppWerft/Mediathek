@@ -1,30 +1,29 @@
 var start = new Date().getTime();
-var $ = function(args) {
-    if (!args)
-        args = {};
-    
-    var color = (args.color) ? args.color : 'white';
+var $ = function(props) {
+    if (!props)
+        props = {};
+    console.log("||||||| START RENDERING OVERLAY ||||||||");
+    console.log(props);
+    var color = (props.color) ? props.color : 'white';
     var $ = Ti.UI.createView({
-        backgroundColor:'#88000000',
-       
-     });
+        backgroundColor : '#88000000',
+
+    });
     $.topcontainer = Ti.UI.createView({
         top : 0,
         layout : "vertical"
     });
-    if (args.image) {
+    if (props.image) {
         $.add(Ti.UI.createImageView({
             touchEnabled : false,
             bottom : 0,
             zIndex : 0,
             width : Ti.UI.FILL,
             height : 'auto',
-            image : args.image
+            image : props.image
         }));
     }
-    $.visualizerContainer = Ti.UI.createView({
-       
-    });
+   
     $.add($.visualizerContainer);
     $.container = Ti.UI.createView({
         bubbleParent : false,
@@ -41,7 +40,7 @@ var $ = function(args) {
         height : 30,
         width : Ti.UI.FILL,
         min : 0,
-        max : 100
+        max : props.duration
     });
     $.slider = Ti.UI.createSlider({
         bottom : 15,
@@ -55,7 +54,7 @@ var $ = function(args) {
     });
     $.duration = Ti.UI.createLabel({
         bottom : 2,
-        text: '0:00',
+        text : '0:00',
         bubbleParent : false,
         touchEnabled : false,
         font : {
@@ -71,8 +70,8 @@ var $ = function(args) {
         color : 'white',
         horizontalWrap : false,
         width : Ti.UI.FILL,
-        text: "Sendung",
-        maxLines:1,
+        text : props.title,
+        maxLines : 1,
         ellipsize : Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE,
         height : 25,
         font : {
@@ -88,8 +87,9 @@ var $ = function(args) {
         color : 'white',
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
+        text : props.subtitle,
         font : {
-            fontSize :  (args.image)? 34 :48,
+            fontSize : (props.image) ? 34 : 48,
             fontFamily : 'ScalaSansBold'
         },
         left : 10,
@@ -103,13 +103,13 @@ var $ = function(args) {
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
         font : {
-            fontSize :  24,
-            fontStyle: 'italic',
+            fontSize : 24,
+            fontStyle : 'italic',
             fontFamily : 'ScalaSansBold'
         },
         left : 10,
         right : 10,
-        text: args.author
+        text : props.author
     });
     $.description = Ti.UI.createLabel({
         top : 10,
@@ -118,12 +118,12 @@ var $ = function(args) {
         color : '#ffffff',
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
-        text : "Beschreibung",
+        text : "",
         font : {
-            fontSize : 22,
+            fontSize : 16,
             fontFamily : 'ScalaSansBold'
         },
-        left : 5,
+        left : 10,
         right : 5
     });
     $.control = Ti.UI.createImageView({
@@ -131,21 +131,10 @@ var $ = function(args) {
         height : 50,
         bubbleParent : false,
         left : 10,
-        image : '/images/play.png',
-        bottom : 15
+        image : '/images/pause.png',
+        bottom : 15,
+        visible : false
     });
-   
-    $.spinner = Ti.UI.createActivityIndicator({
-        width : 50,
-        height : 50,
-        style : Ti.UI.ActivityIndicatorStyle.BIG,
-        bubbleParent : true,
-        touchEnabled : false,
-        left : 10,
-        bottom : 15
-    });
-    $.spinner.show();
-
     $.container.add($.progress);
     $.container.add($.slider);
     $.container.add($.duration);
@@ -158,4 +147,4 @@ var $ = function(args) {
     $.container.add($.spinner);
     return $;
 };
-exports.getView = $;
+exports.getView = $; 

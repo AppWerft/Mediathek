@@ -35,13 +35,13 @@ module.exports = function(station) {
             Streamer.play({
                 url : station.stream,
                 station : station.station,
-                logo : '/images/'+station.station+ '.png',
+                logo : '/images/' + station.station + '.png',
                 title : station.name,
                 color : station.color || 'silver',
                 lifecycleContainer : $,
                 icon : "applogo"
             }, function(e) {
-                if (e.message && PlayerView) 
+                if (e.message && PlayerView)
                     PlayerView.setText(e.message);
                 if (lastStatus != e.status) {
                     lastStatus = e.status;
@@ -61,12 +61,13 @@ module.exports = function(station) {
     var started = false;
 
     $.addEventListener('close', function() {
+        $.cron && clearInterval($.cron);
         stopPlayer();
         $.removeAllChildren();
         $ = null;
     });
     $.addEventListener('open', _e => {
-       // require('ti.immersivemode').hideSystemUI();
+        // require('ti.immersivemode').hideSystemUI();
         const activity = $.activity;
         if (activity != undefined && activity.actionBar != undefined) {
             activity.onCreateOptionsMenu = _menu => {
@@ -89,8 +90,11 @@ module.exports = function(station) {
         } else
             console.log("win has no activity");
         PlayerView = require('liveradio/radioplayer.widget').createView(station);
+        $.cron = setInterval(PlayerView.updateView, 2000);
+
         PlayerView && $.add(PlayerView.getView());
         Permissions.requestPermissions(['READ_PHONE_STATE', 'RECORD_AUDIO'], onPermission);
+        PlayerView && PlayerView.updateView()
     });
     return $;
 };

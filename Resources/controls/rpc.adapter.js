@@ -30,6 +30,7 @@ module.exports = function(_args) {
 					subtitle : item.title,
 					station : item.station,
 					url : item.url,
+					deliveryMode: item.deliveryMode,
 					datetime : item.datetime,
 					pubdate : item.datetime,
 					duration : item.duration,

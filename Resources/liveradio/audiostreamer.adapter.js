@@ -2,8 +2,8 @@
 /*https://github.com/vbartacek/aacdecoder-android/blob/master/decoder/src/com/spoledge/aacdecoder/IcyInputStream.java#L98-L112
  */
 const StreamingPlayer = require("com.woohoo.androidaudiostreamer"),
-    AudioNotification = require("de.appwerft.audionotification");
-  
+    AudioNotification = require("de.appwerft.audionotification"),
+    Dayplan = new (require('controls/dayplan.adapter'))();
 var Notification;
 
 const TICK = 3000;
@@ -14,10 +14,9 @@ var wasLastPingSuccessful = false;
 var audioSessionId;
 
 function LOG() {
-     console.log('🛠AAS: ' + arguments[0]);
-     console.log(arguments[0]);
+    console.log('🛠AAS:');
+    console.log(arguments[0]);
 }
-
 
 var shouldPlay = null;
 // null or URL (string)
@@ -39,9 +38,10 @@ const STOPPED = 0,
 var callbackFn;
 
 function onPlayerChange(_e) {
+
     var status = _e.status;
-//    if (status == PLAYING)
- //       Favs.increment(currentStation.station);
+    //    if (status == PLAYING)
+    //       Favs.increment(currentStation.station);
     if (!Ti.Network.online) {
         // status = STATUS[OFFLINE];
         Ti.UI.createNotification({
@@ -84,17 +84,21 @@ function onPlayerChange(_e) {
                 message : "Streamingproblem"
             }).show();
         }
-
         break;
     }
-    ;
 }
 
 function onMetaData(_event) {
     var message = _event.title;
+    if (currentStation.station != 'drw') {
+        Dayplan.getCurrentOnAir(currentStation.station,item => {
+            if (item.progress != undefined) {
+                Notification.setProgress(item.progress.replace('%', '') / 100);
+            }
+        });
+    }
     Notification.setSubtitle(message);
     Notification.setTitle(currentStation.title);
-    LOG(_event);
     if (callbackFn && typeof callbackFn == 'function')
         callbackFn({
             message : message,
@@ -116,33 +120,41 @@ StreamingPlayer.addEventListener('change', onPlayerChange);
 var currentStation = {};
 
 exports.init = function(lifecycleContainer, icon) {
+    LOG("///////////////// INIT ///////////////");
+    LOG(currentStation);
     Notification = AudioNotification.createNotification({
         lifecycleContainer : lifecycleContainer,
-        icon : icon
+        icon : 'smallicon',
+        progress : 0.0,
+        title : currentStation.title,
+        image : currentStation.largeIcon
     });
     LOG("notification initialized");
 };
 
 exports.play = function(station, _callbackFn) {
-    LOG("//////////////////////////////////");
-    LOG(station);
+    LOG("/////////////// PLAY //////////////");
+    // LOG(station);
     currentStation.title = station.title;
+    currentStation.subtitle = station.subtitle;
     currentStation.station = station.station;
     currentStation.url = station.url;
-    currentStation.largeIcon = station.logo;
+    currentStation.senderlogo = '/images/' + station.station + '.png';
     callbackFn = _callbackFn;
-    LOG(currentStation);
+
     if (currentStation.url != undefined && typeof currentStation.url == 'string') {
         if (Notification) {
             LOG('STATIONTITLE:' + currentStation.title);
             LOG(currentStation);
             Notification.setTitle(currentStation.title);
-            Notification.setSubtitle("");
-            Notification.setLargeIcon(currentStation.largeIcon);
-            Notification.start();
+            Notification.setSubtitle(currentStation.subtitle);
+            Notification.setLargeIcon(currentStation.senderlogo);
+            // Notification.setLargeImage('/images/' + currentStation.station + 'large.png');
+            Notification.update();
             LOG('Notification triggered by JS');
-        } else console.log('!! no Notification');
-        
+        } else
+            console.log('!! no Notification');
+
         shouldPlay = currentStation.url;
         // StreamingPlayer.stop();
         LOG('status after start method = ' + STATUS[StreamingPlayer.getStatus()]);
@@ -153,7 +165,8 @@ exports.play = function(station, _callbackFn) {
         } else {
             StreamingPlayer.play(currentStation.url);
         }
-    } else LOG("issue with url !!!!");
+    } else
+        LOG("issue with url !!!!");
 };
 
 function stopStream() {

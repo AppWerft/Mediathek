@@ -1,6 +1,5 @@
 const Global = require('global');
-const FlipModule = require('de.manumaticx.androidflip');
-! function() {
+const FlipModule = require('de.manumaticx.androidflip'); ! function() {
 
     const $ = Ti.UI.createWindow({
         fullscreen : true
@@ -26,17 +25,17 @@ const FlipModule = require('de.manumaticx.androidflip');
         Global.АктйонБар.titleFont = "ScalaSansBold";
         Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
         Global.АктйонБар.subtitleColor = "#eee";
-         
+
         $.activity.actionBar.displayHomeAsUp = true;
         $.activity.actionBar.onHomeIconItemSelected = function() {
-                $.Drawer.toggleLeft();
+            $.Drawer.toggleLeft();
         };
         $.activity.onCreateOptionsMenu = function(_menuevent) {
             _menuevent.menu.clear();
             _menuevent.menu.add({
                 title : 'Start live Radio',
                 itemId : 1,
-                icon : Ti.App.Android.R.drawable['ic_action_play'],
+                icon : '/images/playbutton.png', ///Ti.App.Android.R.drawable['ic_action_play'],
                 showAsAction : Ti.Android.SHOW_AS_ACTION_IF_ROOM,
             }).addEventListener("click", function() {
                 const station = {
@@ -73,13 +72,13 @@ const FlipModule = require('de.manumaticx.androidflip');
                 height : Ti.UI.FILL
             })
         });
-      $.Drawer.centerView.addEventListener('flipped', function(e) {
+        $.Drawer.centerView.addEventListener('flipped', function(e) {
             Object.keys(Global.Stations).forEach((k,i) => {
                 if (i == e.index) {
                     Global.currentStation = k;
                 }
             });
-            console.log(Global.currentStation);
+
             Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
             Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
             Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
@@ -87,8 +86,13 @@ const FlipModule = require('de.manumaticx.androidflip');
             Ti.App.Properties.setString('LAST_STATION', Global.currentStation);
         });
         $.Drawer.centerView.flipToView($.Drawer.centerView.views[Global.currentPage]);
-        $.add($.Drawer);
        
+        if (Global.currentPage < 2)
+            $.Drawer.centerView.peakNext(false);
+        else
+            $.Drawer.centerView.peakPrevious(false);
+        $.add($.Drawer);
+
     });
     $.open();
 }();

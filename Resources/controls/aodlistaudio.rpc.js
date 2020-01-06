@@ -1,6 +1,5 @@
-var parseNode = function(itemNode) {
-    console.log(itemNode.toString());
-	var entry = {};
+const parseNode = function(itemNode) {
+ 	var entry = {};
 	var entry = {
 		station : itemNode.getElementsByTagName('station').item(0).getTextContent().toLowerCase(),
 		title : itemNode.getElementsByTagName('title').item(0).getTextContent(),
@@ -12,8 +11,9 @@ var parseNode = function(itemNode) {
 	if (itemNode.hasAttributes()) {
 		const attributes = itemNode.getAttributes();
 		entry.url = attributes.getNamedItem('url') ? attributes.getNamedItem('url').nodeValue : null;
-		entry.duration = attributes.getNamedItem('duration').nodeValue;
-		//    entry.id = attributes..getNamedItem('')
+		entry.duration = 1000* attributes.getNamedItem('duration').nodeValue;
+		entry.deliveryMode = attributes.getNamedItem('deliveryMode').nodeValue;
+		entry.file_id = attributes.getNamedItem('file_id').nodeValue;
 	}
 	return entry;
 };
@@ -24,7 +24,10 @@ exports.parseXMLDoc = function(xml) {
 	var length = itemsNodelist.getLength();
 	if (length !== 0) {
 		for (var nodelistindex = 0; nodelistindex < length; nodelistindex++) {
-			entries.push(parseNode(itemsNodelist.item(nodelistindex)));
+		    const item = parseNode(itemsNodelist.item(nodelistindex));
+			//if (item.url.match(/\.mp3$/))
+    			entries.push(item);
+    	//	else console.log(item.url);	
 		}
 	} else
 		console.log('Warning: items are null');

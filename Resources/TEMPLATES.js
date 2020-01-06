@@ -283,109 +283,135 @@ exports.klangkunst = {
 
 /************/
 exports.mediathek = {
-	properties : {
-		height : Ti.UI.SIZE,
-		backgroundColor : 'white',
-		itemId : ''
-	},
-	childTemplates : [{
-		type : 'Ti.UI.Label',
-		bindId : 'start',
-		properties : {
-			left : 5,
-			height : Ti.UI.SIZE,
-			touchEnabled : false,
-			top : 2,
-			color : '#555',
-			font : {
-				fontSize : 22,
-				fontFamily : 'Aller'
-			},
-		}
-	}, {
-		type : 'Ti.UI.ImageView',
-		bindId : 'fav',
-		properties : {
-			opacity : 0.5,
-			left : 5,
-			visible: false,
-			top : 32,
-			bottom : 5,
-			bubbleParent : true,
-			image : '/images/favadd.png',
-			width : 30,
-			height : 30
-		}
-	}, {
-		type : 'Ti.UI.ImageView',
-		bindId : 'share',
-		properties : {
-			opacity : 0.5,
-			left : 35,
-			visible: false,
-			top : 35,
-			bottom : 5,
-			bubbleParent : true,
-			image : '/images/share.png',
-			width : 27,
-			height : 27
-		}
-	}, {
-		type : 'Ti.UI.View',
-		bindId : 'playtrigger',
-		properties : {
-			width : Ti.UI.FILL,
-			layout : 'vertical',
-			left : 75,
-			height: Ti.UI.SIZE,
-			right : 25
-		},
-		childTemplates : [{
-			type : 'Ti.UI.Label',
-			bindId : 'subtitle',
-			properties : {
-				left : 0,
-				top : 5,
-				touchEnabled : false,
-				font : {
-					fontSize : 20,
-					fontFamily : 'Aller Bold'
-				},
-				color : '#555',
-				height : Ti.UI.SIZE
-			}
-		}, {
-			type : 'Ti.UI.Label',
-			bindId : 'autor',
-			properties : {
-				left : 0,
-				top : 5,
+    properties : {
+        height : Ti.UI.SIZE,
+        backgroundColor : 'white',
+        itemId : ''
+    },
+    childTemplates : [{
+        type : 'Ti.UI.Label',
+        bindId : 'start',
+        properties : {
+            left : 5,
+            height : Ti.UI.SIZE,
+            touchEnabled : false,
+            top : 2,
+            color : '#555',
+            font : {
+                fontSize : 22,
+                fontFamily : 'Aller'
+            },
+        }
+    }, {
+        type : 'Ti.UI.ImageView',
+        bindId : 'fav',
+        properties : {
+            opacity : 0.5,
+            left : 5,
+            visible: false,
+            top : 32,
+            bottom : 5,
+            bubbleParent : true,
+            image : '/images/favadd.png',
+            width : 30,
+            height : 30
+        }
+    }, {
+        type : 'Ti.UI.ImageView',
+        bindId : 'share',
+        properties : {
+            opacity : 0.5,
+            left : 35,
+            visible: false,
+            top : 35,
+            bottom : 5,
+            bubbleParent : true,
+            image : '/images/share.png',
+            width : 27,
+            height : 27
+        }
+    }, {
+        type : 'Ti.UI.View',
+        bindId : 'playtrigger',
+        properties : {
+            width : Ti.UI.FILL,
+            layout : 'vertical',
+            left : 75,
+            height: Ti.UI.SIZE,
+            right : 25
+        },
+        childTemplates : [{
+            type : 'Ti.UI.Label',
+            bindId : 'subtitle',
+            properties : {
+                left : 0,
+                top : 5,
+                touchEnabled : false,
+                font : {
+                    fontSize : 20,
+                    fontFamily : 'Aller Bold'
+                },
+                color : '#555',
+                height : Ti.UI.SIZE
+            }
+        }, {
+            type : 'Ti.UI.Label',
+            bindId : 'autor',
+            properties : {
+                left : 0,
+                top : 5,
 
-				height : Ti.UI.SIZE,
-				touchEnabled : false,
-				font : {
-					fontSize : 12,
-					fontFamily : 'Aller'
-				},
-				color : '#333'
-			}
-		}, {
-			type : 'Ti.UI.Label',
-			bindId : 'duration',
-			properties : {
-				left : 0,
-				top : 0,
-				bottom : 10,
-				height : Ti.UI.SIZE,
-				touchEnabled : false,
-				font : {
-					fontSize : 18,
-					fontFamily : 'Aller'
-				},
-				color : '#333'
-			}
-		}]
-	}]
+                height : Ti.UI.SIZE,
+                touchEnabled : false,
+                font : {
+                    fontSize : 12,
+                    fontFamily : 'Aller'
+                },
+                color : '#333'
+            }
+        }, {
+        
+        type : 'Ti.UI.View',
+       properties : {
+            width : Ti.UI.FILL,
+            bottom:10,
+            left : 0,
+            height: Ti.UI.SIZE,
+            right : 25
+        },
+        childTemplates :  [{
+            type : 'Ti.UI.ImageView',
+            bindId : 'deliveryMode',
+            properties : {
+                left : 0,
+                top : 5,
+                
+                height : Ti.UI.SIZE,
+                touchEnabled : false,
+                width : 30,
+                height: 16,
+                opacity:0.6
+              
+            }
+        },{
+            type : 'Ti.UI.Label',
+            bindId : 'duration',
+            properties : {
+                left : 40,
+                top : 0,
+                
+                height : Ti.UI.SIZE,
+                touchEnabled : false,
+                font : {
+                    fontSize : 18,
+                    fontFamily : 'Aller'
+                },
+                color : '#333'
+            }
+        }
+        ]
+    }]
+    }]
 };
 
 exports.merkliste = {

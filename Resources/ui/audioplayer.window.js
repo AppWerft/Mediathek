@@ -1,7 +1,6 @@
 'use strict';
 
-var StorageAdapter = require('controls/storage.adapter'),
-
+const StorageAdapter = require('controls/storage.adapter'),
     Moment = require('vendor/moment'),
     Stations = require('model/stations'),
     playerViewModule = require('ui/audioplayer.widget'),
@@ -12,54 +11,68 @@ var StorageAdapter = require('controls/storage.adapter'),
     TIMEOUT = 30000;
 
 TelephonyManager.addEventListener('callState', function(_e) {
-    if (TelephonyManager.CALL_STATE_RINGING == _e.state && singletonPlayer.playing == true)
-        singletonPlayer.pause();
+    if (TelephonyManager.CALL_STATE_RINGING == _e.state && AudioPlayer.playing == true)
+        AudioPlayer.pause();
 });
 
-var singletonPlayer = Ti.Media.createAudioPlayer({
+var AudioPlayer = Ti.Media.createAudioPlayer({
     allowBackground : true,
     volume : 1.0
 });
-console.log("📻singletonPlayer created");
+console.log("📻AudioPlayer created");
 
-if (singletonPlayer.seek === undefined)
-    singletonPlayer.seek = singletonPlayer.setTime;
+if (AudioPlayer.seek === undefined)
+    AudioPlayer.seek = AudioPlayer.setTime;
 
 var alertactive = false;
 
 /* ********************************************************* */
 var $ = function(options) {
+    const that = this;
+    that.Gears = require('ui/gears.widget')(options.station);
+    
+    that.onBufferingStartedFn = function(res) {
+        that._window.add(that.Gears);
+        console.log("=======> onBuffereringWorkingFn");
+        
+    };
+    that.onBuffereringWorkingFn = function(res) {
+        console.log("=======> onBuffereringWorkingFn");
+        that.Gears && that._window.remove(that.Gears);
+        that.onBufferingStartedFn && that.Storage.removeEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
+        that.startPlayer(res.file, res.progress);
+    };
+    that.onDownloadReadyFn = function(res) {
+        console.log("=======> onDownloadReadyFn " + res.duration / 1000 / 60);
+        that._view.control.show();
+    };
     options.color = options.station && Stations[options.station] ? Stations[options.station].color : "#555";
-    this.options = options;
-    if (singletonPlayer && singletonPlayer.playing)
-        singletonPlayer.release();
+    that.options = options;
+    that.Storage = StorageAdapter.createFileCache(that.options.station, that.options.url);
+    that.Storage.addEventListener("ACTION_READYTOPLAY", that.onBuffereringWorkingFn);
+    that.Storage.addEventListener("ACTION_READYTOSEEK", that.onDownloadReadyFn);
+    that.Storage.addEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
+    
+    if (AudioPlayer && AudioPlayer.playing)
+        AudioPlayer.release();
 
-    this.setControlView = function() {
-        /*if (CacheAdapter.isCached(this.options)) {
-            that._view.control.setImage('/images/pause.png');
-        } else {
-            var sec = Math.round((new Date().getTime() / 1000));
-            that._view.control.setImage(sec % 2 ? '/images/cache.png' : '/images/cache_.png');
-        }*/
-    };
-    this.onSliderChangeFn = function(_e) {
+    that.onSliderChangeFn = function(_e) {
+        const FORMAT = (that.options.duration < 60 * 60 * 1000) ? "m:ss" : "H:mm:ss";
         that._view.progress.value = _e.value;
-        that._view.duration.text = Moment(_e.value).utc().format('HH:mm:ss') + ' / ' + Moment.unix(that.options.duration).utc().format('HH:mm:ss');
+        that._view.duration.text = Moment(_e.value).utc().format(FORMAT) + ' / ' + Moment(that.options.duration).utc().format(FORMAT);
     };
-    this.onProgressFn = function(_e) {
-        const FORMAT = (that.options.duration < 60 * 60) ? "mm:ss" : "HH:mm:ss";
+    that.onProgressFn = function(_e) {
+        const FORMAT = (that.options.duration < 60 * 60 * 1000) ? "m:ss" : "H:mm:ss";
+        // console.log(that._view.progress.value + '   ' +that._view.progress.max)
         that._view.progress.value = _e.progress;
         that._view.slider.value = _e.progress;
-        that._view.duration.text = Moment(_e.progress).utc().format(FORMAT) + ' / ' + Moment.unix(that.options.duration).utc().format(FORMAT);
+        that._view.duration.text = Moment(_e.progress).utc().format(FORMAT) + ' / ' + Moment(that.options.duration).utc().format(FORMAT);
         /* saving to model */
-        that._Recents.setProgress({
-            progress : _e.progress / 1000,
-            url : that.options.url
-        });
+        that.Storage.setProgress(_e.progress);
         // updating ControlView
-        that.setControlView();
+
     };
-    this.onCompleteFn = function(_e) {
+    that.onCompleteFn = _e => {
         if (_e.error)
             Ti.UI.createNotication({
                 message : _e.error,
@@ -68,219 +81,186 @@ var $ = function(options) {
         console.log("📻onCompleteFn success=" + _e.success);
         console.log("📻onCompleteFn error=" + _e.error);
         console.log("📻onCompleteFn code=" + _e.code);
-        var diff = Math.abs(_e.source.getDuration() - _e.source.getTime());
-        if (diff < 10 * 1000) {
-            console.log("📻onCompleteFn diff=" + diff);
-            if (that._view)
-                that._view.setVisible(false);
-            that._Recents.setComplete();
-            that.onStatusChangeFn({
-                description : 'stopped'
-            });
-        } else {
-            that.startPlayer(_e.source.getTime());
-        }
-
+        if (that._view)
+            that._view.setVisible(false);
+        that.Storage.setComplete();
+        that.Storage.setProgress(0);
+        if (that.onProgressFn)
+            AudioPlayer.removeEventListener('progress', this.onProgressFn);
+        if (that.onCompleteFn)
+            AudioPlayer.removeEventListener('complete', this.onCompleteFn);
+        if (that.onStatusChangeFn)
+            AudioPlayer.removeEventListener('change', this.onStatusChangeFn);
+        that.Storage.removeEventListener("ACTION_READYTOPLAY", that.onBuffereringWorkingFn);
+        that.Storage.removeEventListener("ACTION_READYTOSEEK", that.onDownloadReadyFn);
+        that.Storage.removeEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
+        
+        that.Storage = null;
+        that._view.mVisualizerView = null;
+        AudioPlayer && AudioPlayer.release();
+        console.log("Player released");
+        setTimeout(function() {
+            if (that._window) {
+                that._window.removeEventListener('close', that.stopPlayer);
+                that._window.removeAllChildren();
+                console.log("Window is empty, try to close");
+                that.Storage = null;
+                that._window.close({
+                    activityEnterAnimation : Ti.Android.R.anim.fade_in,
+                    activityExitAnimation : Ti.Android.R.anim.fade_out
+                });
+            }
+        }, 500);
     };
-    this.onStatusChangeFn = function(_e) {
+    that.onStatusChangeFn = _e => {
         console.log("📻onStatusChangeFn Info: AudioPlayer sends >>>>>>" + _e.description);
         switch (_e.description) {
         case 'stopped':
-        case "stopping":
-            if (this.onProgressFn && typeof this.onProgressFn == 'function')
-                singletonPlayer.removeEventListener('progress', this.onProgressFn);
-            if (this.onCompleteFn && typeof this.onCompleteFn == 'function')
-                singletonPlayer.removeEventListener('complete', this.onCompleteFn);
-            if (this.onStatusChangeFn && typeof this.onStatusChangeFn == 'function')
-                singletonPlayer.removeEventListener('change', this.onStatusChangeFn);
-            that._view.mVisualizerView = null;
-            singletonPlayer && singletonPlayer.release();
-            setTimeout(function() {
-                that._view.control.image = '/images/play.png';
-                if (that._window) {
-                    that._window.removeEventListener('close', that.stopPlayer);
-                    that._window.removeAllChildren();
-                    that._window.close({
-                        activityEnterAnimation : Ti.Android.R.anim.fade_in,
-                        activityExitAnimation : Ti.Android.R.anim.fade_out
-                    });
-                }
-            }, 1500);
-
             break;
         case 'stopping':
-            break;
-        case 'starting':
-            console.log('📻Player starting');
-            if (that._view.visualizerView) {
-                that._view.visualizerContainer.show();
-                that._view.visualizerContainer.add(that._view.visualizerView);
-                console.log('📻 Visu added');
-            } else
-                console.log("📻 NO Visu added");
-
-            if (timeout) {
-                clearTimeout(timeout);
-                timeout = null;
-            }
-            setTimeout(function() {
-                CacheAdapter.cacheURL(options);
-            }, 3000);
-            //that._view.control.image = '/images/leer.png';
             break;
         case 'paused':
             that._view.sendung.ellipsize = false;
             that._view.control.setImage('/images/play.png');
             that._view.slider.show();
             that._view.progress.hide();
-            that._view.visualizerContainer.hide();
+          //  that._view.visualizerContainer.hide();
             that._view.slider.addEventListener('change', that.onSliderChangeFn);
             break;
         case 'playing':
-            if (alertactive === true)
-                return;
             that._view.slider.removeEventListener('change', that.onSliderChangeFn);
             that._view.progress.show();
             that._view.slider.hide();
-            that._view.spinner.hide();
             //that._view.subtitle.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
-            that._view.sendung.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
-            that._view.visualizerContainer.show();
-            that.setControlView();
+            //  that._view.sendung.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
+          //  that._view.visualizerContainer.show();
             break;
         }
     };
-    this.stopPlayer = function() {
+    that.stopPlayer = function() {
         console.log("📻 stoppingPlayer");
-        if (this._view.mVisualizerView) {
-            this._view.mVisualizerView = null;
+        if (that._view.mVisualizerView) {
+            that._view.mVisualizerView = null;
         }
-        if (this._view) {
-            this._view.removeAllChildren();
-            this._view == null;
+        if (that._view) {
+            that._view.removeAllChildren();
+            that._view == null;
         }
-        //  singletonPlayer.seek(0);
-        singletonPlayer.stop();
-        singletonPlayer && singletonPlayer.release();
-        //  if (!singletonPlayer.playing)  {
+        AudioPlayer.seek(0);
+        AudioPlayer.stop();
+        AudioPlayer && AudioPlayer.release();
+        //  if (!AudioPlayer.playing)  {
         that._window.close();
         //  }
-        singletonPlayer.removeEventListener('progress', this.onProgressFn);
-        singletonPlayer.removeEventListener('complete', this.onCompleteFn);
-        singletonPlayer.removeEventListener('change', this.onStatusChangeFn);
+        AudioPlayer.removeEventListener('progress', that.onProgressFn);
+        AudioPlayer.removeEventListener('complete', that.onCompleteFn);
+        AudioPlayer.removeEventListener('change', that.onStatusChangeFn);
     };
-    this.startPlayer = function(time) {
-
+    that.startPlayer = (audioFile, time) => {
+        if (!audioFile) {
+            console.log('no file in startPlayer');
+            return;
+        }
         console.log("📻 START PLAYER");
         if (!time)
             time = 0;
-        var that = this;
-        this._view.setVisible(true);
-        var maxRange = this.options.duration * 1000;
-        this._view.progress.setMax(maxRange);
-        this._view.slider.setMax(maxRange);
-        this._view.progress.value = 0;
-        this._view.slider.value = 0;
-        this._view.sendung.text = this.options.title;
-        //    this._view.title.setColor(this.options.color);
-        this._view.title.text = this.options.subtitle;
-        this._view.description.setText(this.options.description ? this.options.description : "");
-        this._view.duration.setText(Moment.unix(this.options.duration).utc().format('HH:mm:ss'));
-        singletonPlayer && singletonPlayer.release();
-        singletonPlayer.seek(time);
 
-        /*  if (item.cached || Ti.Network.online) {
-         singletonPlayer.setUrl(item.url);
-         singletonPlayer.start();
-         timeout = setTimeout(that.stopPlayer, TIMEOUT);
-         return;
-         }
-         Ti.UI.createNotification({
-         message : "Der Beitrag ist noch nicht nicht heruntergeladen und ich sehe Probleme mit dem Internet"
-         }).show();*/
-        this.stopPlayer();
+        /*
+         var maxRange = that.options.duration * 1000;
+         that._view.progress.setMax(maxRange);
+         that._view.slider.setMax(maxRange);
+         that._view.progress.value = 0;
+         that._view.slider.value = 0;
+         that._view.sendung.text = this.options.title;
+         //    this._view.title.setColor(this.options.color);
+         that._view.title.text = this.options.subtitle;
+         that._view.description.text=this.options.description ? this.options.description : "";
+         that._view.duration.text = Moment.unix(this.options.duration).utc().format('HH:mm:ss');
+         */
+        AudioPlayer && AudioPlayer.release();
+        // 
+        
+        AudioPlayer.seek(time);//AudioPlayer.time = time;
+        console.log(audioFile.nativePath + ' exists=' + audioFile.exists());    
+        AudioPlayer.url = audioFile.nativePath;
+        AudioPlayer.start();
+        //         timeout = setTimeout(that.stopPlayer, TIMEOUT);
+        return;
+        //this.stopPlayer();
     };
-    this.createWindow = function() {
-        console.log("createWindow");
-        this._window = Ti.UI.createWindow({
+    that.createWindow = function() {
+        that._window = Ti.UI.createWindow({
             backgroundColor : 'transparent',
             theme : 'Theme.AppCompat.Translucent.NoTitleBar.Fullscreen',
             modal : true
         });
+
+        AudioPlayer.addEventListener('progress', this.onProgressFn);
+        AudioPlayer.addEventListener('complete', this.onCompleteFn);
+        AudioPlayer.addEventListener('change', this.onStatusChangeFn);
+        that._window.addEventListener("android:back", () => {
+            that._view.control.fireEvent('longpress', {});
+            return false;
+        });
         /* here begins the real code */
-        function onStart() {
 
-        }
-
-        function onLoad() {
-
-        }
-
-        const Storage = StorageAdapter.create();
-        const item = Storage.addItem(this.options, onStart, onLoad);
-        var that = this;
         that._view = playerViewModule.getView(that.options);
         that._window.add(that._view);
         console.log("Overlay added");
+
         that._view.control.addEventListener('longpress', function() {
             that.stopPlayer();
         });
         that._view.control.addEventListener('singletap', function() {
             /*
              if (CacheAdapter.isCached(that.options)) {
-             if (singletonPlayer.playing)
-             singletonPlayer.pause();
+             if (AudioPlayer.playing)
+             AudioPlayer.pause();
              else {
              that.progress = that._view.slider.getValue();
-             singletonPlayer.seek(that.progress);
-             singletonPlayer.play();
+             AudioPlayer.seek(that.progress);
+             AudioPlayer.play();
              }
              }*/
         });
 
         this._window.addEventListener('open', function() {
             console.log("window is open");
-            that.startPlayer();
-            Permissions.requestPermissions(['RECORD_AUDIO','WRITE_EXTERNAL_STORAGE'], _success => {
-                if (_success) {
-                    console.log("Permissions granted");
-                    that._view.visualizerView = AudioVisualizer.createView({
+            function onLoad(props) {
+                console.log(props.progress + '    ' + props.uri);
+                that.startPlayer(props.uri, props.progress);
+                clearInterval(that.cron);
+            }
 
-                        audioSessionId : 0,
-                        linegraphRenderer : {
-                            strokeWidth : 0.7 * Ti.Platform.displayCaps.logicalDensityFactor
-                        },
-                        bargraphRenderer : {
-                            barWidth : Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor / 7 * Ti.Platform.displayCaps.logicalDensityFactor,
-                            color : that.options.color,
-                            divisions : 9
-                        },
-                        touchEnabled : false,
-                        lifecycleContainer : that._window,
-                    });
+            Permissions.requestPermissions(['WRITE_EXTERNAL_STORAGE'], _success => {
+                if (_success) {
+                    that.Storage.loadFile(that.options, onLoad);
+                    Permissions.requestPermissions(['RECORD_AUDIO'], _success => {
+                         if (_success) {
+                            const visualizerView = AudioVisualizer.createView({
+                                audioSessionId : 0,
+                                linegraphRenderer : {
+                                    strokeWidth : 0.7 * Ti.Platform.displayCaps.logicalDensityFactor
+                                },
+                                bargraphRenderer : {
+                                    barWidth : Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor / 7 * Ti.Platform.displayCaps.logicalDensityFactor,
+                                    color : that.options.color,
+                                    divisions : 9
+                                },
+                                touchEnabled : false,
+                                lifecycleContainer : that._window,
+                            });
+                            that._view.add(visualizerView);
+                            console.log("that._view.visualizerView created");
+                        }
+                     });   
                 }
             });
         });
         this._window.open();
         console.log("📻 window opened");
-        return true;
     };
-
-    if (this.createWindow()) {
-        console.log("📻createWindow");
-        var that = this;
-
-        console.log("📻adding events to Player");
-        singletonPlayer.addEventListener('progress', this.onProgressFn);
-        singletonPlayer.addEventListener('complete', this.onCompleteFn);
-        singletonPlayer.addEventListener('change', this.onStatusChangeFn);
-        console.log("📻 events added to Player");
-        this._window.addEventListener("android:back", function() {
-            that._view.control.fireEvent('longpress', {});
-            return false;
-        });
-    }
-
+    this.createWindow();
 };
 
 exports.createAndStartPlayer = function(options) {
