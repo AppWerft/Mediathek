@@ -87,12 +87,14 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
         });
         $.Drawer.centerView.flipToView($.Drawer.centerView.views[Global.currentPage]);
        
+        const repeating = Ti.App.Properties.hasProperty("LL");
         if (Global.currentPage < 2)
-            $.Drawer.centerView.peakNext(false);
+            $.Drawer.centerView.peakNext(repeating);
         else
-            $.Drawer.centerView.peakPrevious(false);
+            $.Drawer.centerView.peakPrevious(repeating);
         $.add($.Drawer);
-
+       
+         Ti.App.Properties.setBool("LL",true);   
     });
     $.open();
 }();

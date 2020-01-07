@@ -27,12 +27,12 @@
     </style>
     
     <style name="Theme.Dlrmediathek" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-    	
-    	
-    	
-    	
-    	
-        <item name="actionBarItemBackground">@drawable/selectable_background_dlrmediathek</item>
+   
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+
+   	<item name="actionBarItemBackground">@drawable/selectable_background_dlrmediathek</item>
         <item name="popupMenuStyle">@style/PopupMenu.Dlrmediathek</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Dlrmediathek</item>
         <item name="actionBarTabStyle">@style/ActionBarTabStyle.Dlrmediathek</item>

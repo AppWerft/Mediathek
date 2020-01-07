@@ -30,29 +30,31 @@ var alertactive = false;
 var $ = function(options) {
     const that = this;
     that.Gears = require('ui/gears.widget')(options.station);
-    
+    that.Gears.animate({
+        bottom : 0
+    });
     that.onBufferingStartedFn = function(res) {
         that._window.add(that.Gears);
-        console.log("=======> onBuffereringWorkingFn");
-        
+        console.log("=======> onReadyToPlayFn");
+
     };
-    that.onBuffereringWorkingFn = function(res) {
-        console.log("=======> onBuffereringWorkingFn");
+    that.onReadyToPlayFn = function(res) {
+        console.log("=======> onReadyToPlayFn");
+        console.log(AudioPlayer.duration);
         that.Gears && that._window.remove(that.Gears);
         that.onBufferingStartedFn && that.Storage.removeEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
         that.startPlayer(res.file, res.progress);
     };
-    that.onDownloadReadyFn = function(res) {
-        console.log("=======> onDownloadReadyFn " + res.duration / 1000 / 60);
+    that.onReadyToSeek = function() {
         that._view.control.show();
     };
     options.color = options.station && Stations[options.station] ? Stations[options.station].color : "#555";
     that.options = options;
     that.Storage = StorageAdapter.createFileCache(that.options.station, that.options.url);
-    that.Storage.addEventListener("ACTION_READYTOPLAY", that.onBuffereringWorkingFn);
-    that.Storage.addEventListener("ACTION_READYTOSEEK", that.onDownloadReadyFn);
+    that.Storage.addEventListener("ACTION_READYTOPLAY", that.onReadyToPlayFn);
+    that.Storage.addEventListener("ACTION_READYTOSEEK", that.onReadyToSeek);
     that.Storage.addEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
-    
+
     if (AudioPlayer && AudioPlayer.playing)
         AudioPlayer.release();
 
@@ -62,8 +64,8 @@ var $ = function(options) {
         that._view.duration.text = Moment(_e.value).utc().format(FORMAT) + ' / ' + Moment(that.options.duration).utc().format(FORMAT);
     };
     that.onProgressFn = function(_e) {
+        that.progress = _e.progress;
         const FORMAT = (that.options.duration < 60 * 60 * 1000) ? "m:ss" : "H:mm:ss";
-        // console.log(that._view.progress.value + '   ' +that._view.progress.max)
         that._view.progress.value = _e.progress;
         that._view.slider.value = _e.progress;
         that._view.duration.text = Moment(_e.progress).utc().format(FORMAT) + ' / ' + Moment(that.options.duration).utc().format(FORMAT);
@@ -73,14 +75,27 @@ var $ = function(options) {
 
     };
     that.onCompleteFn = _e => {
+        console.log("📻onCompleteFn success=" + _e.success);
+        console.log("📻onCompleteFn error=" + _e.error);
+        console.log("📻onCompleteFn code=" + _e.code);
         if (_e.error)
             Ti.UI.createNotication({
                 message : _e.error,
                 duration : 3000
             }).show();
-        console.log("📻onCompleteFn success=" + _e.success);
-        console.log("📻onCompleteFn error=" + _e.error);
-        console.log("📻onCompleteFn code=" + _e.code);
+        console.log("Progress: " + that.progress / 1000);
+        console.log("Duration: " + AudioPlayer.duration / 1000);
+        console.log("DL-Progress: " + that.Storage.status.downloadprogress / 1000);
+        if (that.Storage.status.downloadprogress > AudioPlayer.duration / 1000) {
+            AudioPlayer && AudioPlayer.release();
+        //
+
+        AudioPlayer.seek(that.progress);
+        AudioPlayer.url = that.nativePath;
+        AudioPlayer.start();
+            return;
+        }
+        
         if (that._view)
             that._view.setVisible(false);
         that.Storage.setComplete();
@@ -91,10 +106,10 @@ var $ = function(options) {
             AudioPlayer.removeEventListener('complete', this.onCompleteFn);
         if (that.onStatusChangeFn)
             AudioPlayer.removeEventListener('change', this.onStatusChangeFn);
-        that.Storage.removeEventListener("ACTION_READYTOPLAY", that.onBuffereringWorkingFn);
-        that.Storage.removeEventListener("ACTION_READYTOSEEK", that.onDownloadReadyFn);
+        that.Storage.removeEventListener("ACTION_READYTOPLAY", that.onReadyToPlayFn);
+        that.Storage.removeEventListener("ACTION_READYTOSEEK", that.onReadyToSeekFn);
         that.Storage.removeEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
-        
+
         that.Storage = null;
         that._view.mVisualizerView = null;
         AudioPlayer && AudioPlayer.release();
@@ -124,7 +139,7 @@ var $ = function(options) {
             that._view.control.setImage('/images/play.png');
             that._view.slider.show();
             that._view.progress.hide();
-          //  that._view.visualizerContainer.hide();
+            //  that._view.visualizerContainer.hide();
             that._view.slider.addEventListener('change', that.onSliderChangeFn);
             break;
         case 'playing':
@@ -133,7 +148,7 @@ var $ = function(options) {
             that._view.slider.hide();
             //that._view.subtitle.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
             //  that._view.sendung.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
-          //  that._view.visualizerContainer.show();
+            //  that._view.visualizerContainer.show();
             break;
         }
     };
@@ -178,10 +193,12 @@ var $ = function(options) {
          that._view.duration.text = Moment.unix(this.options.duration).utc().format('HH:mm:ss');
          */
         AudioPlayer && AudioPlayer.release();
-        // 
-        
-        AudioPlayer.seek(time);//AudioPlayer.time = time;
-        console.log(audioFile.nativePath + ' exists=' + audioFile.exists());    
+        //
+
+        AudioPlayer.seek(time);
+        //AudioPlayer.time = time;
+        that.nativePath = audioFile.nativePath;
+        console.log(audioFile.nativePath + ' exists=' + audioFile.exists());
         AudioPlayer.url = audioFile.nativePath;
         AudioPlayer.start();
         //         timeout = setTimeout(that.stopPlayer, TIMEOUT);
@@ -236,7 +253,7 @@ var $ = function(options) {
                 if (_success) {
                     that.Storage.loadFile(that.options, onLoad);
                     Permissions.requestPermissions(['RECORD_AUDIO'], _success => {
-                         if (_success) {
+                        if (_success) {
                             const visualizerView = AudioVisualizer.createView({
                                 audioSessionId : 0,
                                 linegraphRenderer : {
@@ -253,7 +270,7 @@ var $ = function(options) {
                             that._view.add(visualizerView);
                             console.log("that._view.visualizerView created");
                         }
-                     });   
+                    });
                 }
             });
         });

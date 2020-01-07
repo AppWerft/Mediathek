@@ -79,5 +79,6 @@ module.exports = function() {
 		bottom : 10,
 		height : 120
 	}));*/
+	
 	return self;
 };

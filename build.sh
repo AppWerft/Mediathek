@@ -1,1 +1,1 @@
-appc ti build -p android -K ~/.android.keystore -P *MHpsNH -T dist-playstore --sdk 8.3.0.GA
+appc ti build -p android -d dist -K ~/.android.keystore -P *MHpsNH -T dist-playstore --sdk 8.3.0.GA
