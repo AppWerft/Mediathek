@@ -3,7 +3,8 @@ const Moment = require('vendor/moment'),
     FFmpeg = require("ti.ffmpeg"),
     FOLDER = 'RadioCache',
     FORCED = false;
-    BUFFER_TIME = 5000; //5 sec.
+BUFFER_TIME = 10000;
+//5 sec.
 
 var start = new Date().getTime();
 
@@ -72,7 +73,7 @@ function getLocalFile(station, url) {
     Object.keys(regex).forEach(codec => {
         const m = url.match(regex[codec]);
         if (m) {
-            localfile = Ti.Filesystem.getFile(DEPOT, FOLDER, station, m[1] + '.' + codec);
+            localfile = Ti.Filesystem.getFile(DEPOT, FOLDER, station, m[1] + '.' + "mp3");
         }
     });
 
@@ -87,9 +88,9 @@ function getLocalFile(station, url) {
 const $ = function(station, url) {
     this.eventhandlers = [];
     this.status = {
-        downloadprogress :0,
+        downloadprogress : 0,
         complete : false,
-        started : false  
+        started : false
     };
     this.start = (new Date()).getTime();
 
@@ -97,7 +98,6 @@ const $ = function(station, url) {
     this.station = station;
     this.readytoplay = false;
 
-    
     this.localfile = getLocalFile(station, url);
     return this;
 };
@@ -125,7 +125,7 @@ $.prototype = {
         const that = this;
         LOG('loadFile');
         LOG(props);
-        this.status.duration= props.duration;
+        this.status.duration = props.duration;
         // start of logic:
         LOG("////////////////START DOWNLAD\\\\\\\\\\\\\\\\\\");
 
@@ -144,9 +144,10 @@ $.prototype = {
             this.fireEvent("ACTION_READYTOSEEK", {});
         } else {// new, must added:
             const onHLSProgress =  p => {
-                this.status.downloadprogress= p.time;
-                if (this.status.started) return;
-                if (this.status.downloadprogress > BUFFER_TIME) { // 1 sec bonus time
+                this.status.downloadprogress = p.time;
+                if (this.status.started)
+                    return;
+                if (this.status.downloadprogress > BUFFER_TIME) {// 1 sec bonus time
                     this.fireEvent("ACTION_READYTOPLAY", this.getState());
                     this.status.started = true;
                     LOG("ACTION_READYTOPLAY in `onHLSProgress` fired");
@@ -156,14 +157,14 @@ $.prototype = {
             this.fireEvent("ACTION_BUFFERINGSTARTED", {});
             const client = FFmpeg.createHLSClient();
             // during download this will called every second:
-            client.setInput(this.url).setFile(this.localfile).setOverwrite(true);
+            client.setInput(this.url).setAudiocodec(FFmpeg.CODEC_MP3).setFile(this.localfile).setOverwrite(true);
             client.addEventListener("onProgress", onHLSProgress);
             client.execute();
             client.onFinish = p => {
                 client.removeEventListener("onProgress", onHLSProgress);
                 if (!this.status.started)
                     this.fireEvent("ACTION_READYTOPLAY", this.getState());
-                this.status.started = true;    
+                this.status.started = true;
                 const link = Ti.Database.open(DB);
                 link.execute("UPDATE recents SET status=? WHERE url=?", 8, this.url);
                 link.close();

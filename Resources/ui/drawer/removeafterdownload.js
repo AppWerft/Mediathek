@@ -1,3 +1,6 @@
+const Settings = require('controls/settings');
+const KEY = "REMOVEAFTERDOWNLOAD";
+
 module.exports = function() {
     const $ = Ti.UI.createView({
         height : 45
@@ -11,8 +14,11 @@ module.exports = function() {
      $.add(Ti.UI.createSwitch({
         color : 'white',
         right : 5,
-          enabled : false,
-        value : true
+          enabled : true,
+        value : Settings.get(KEY)
     }));
+    $.children[1].addEventListener("change", e => {
+        Settings.set(KEY, e.value);
+    });
     return $;
 };

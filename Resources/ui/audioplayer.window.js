@@ -17,8 +17,12 @@ TelephonyManager.addEventListener('callState', function(_e) {
 
 var AudioPlayer = Ti.Media.createAudioPlayer({
     allowBackground : true,
-    volume : 1.0
+    volume : 1.0,
+    seeked : false,
+    audioFocus : true
 });
+AudioPlayer.release();
+
 console.log("📻AudioPlayer created");
 
 if (AudioPlayer.seek === undefined)
@@ -86,16 +90,19 @@ var $ = function(options) {
         console.log("Progress: " + that.progress / 1000);
         console.log("Duration: " + AudioPlayer.duration / 1000);
         console.log("DL-Progress: " + that.Storage.status.downloadprogress / 1000);
-        if (that.Storage.status.downloadprogress > AudioPlayer.duration / 1000) {
-            AudioPlayer && AudioPlayer.release();
-        //
 
-        AudioPlayer.seek(that.progress);
-        AudioPlayer.url = that.nativePath;
-        AudioPlayer.start();
+        if (that.Storage.status.downloadprogress > AudioPlayer.duration / 1000 + 1) {
+            console.log("false complete => restart with new duration");
+            AudioPlayer && AudioPlayer.release();
+            AudioPlayer.seek(that.progress + 500);
+            AudioPlayer.url = that.nativePath;
+            AudioPlayer.start();
+            Ti.UI.createNotification({
+                message : "Internet-Schluckauf"
+            }).show();
             return;
         }
-        
+
         if (that._view)
             that._view.setVisible(false);
         that.Storage.setComplete();
@@ -163,7 +170,7 @@ var $ = function(options) {
         }
         AudioPlayer.seek(0);
         AudioPlayer.stop();
-        AudioPlayer && AudioPlayer.release();
+        AudioPlayer.release();
         //  if (!AudioPlayer.playing)  {
         that._window.close();
         //  }
@@ -180,19 +187,20 @@ var $ = function(options) {
         if (!time)
             time = 0;
 
-        /*
-         var maxRange = that.options.duration * 1000;
+        
+         var maxRange = that.options.duration ;
          that._view.progress.setMax(maxRange);
          that._view.slider.setMax(maxRange);
          that._view.progress.value = 0;
          that._view.slider.value = 0;
+         /*
          that._view.sendung.text = this.options.title;
          //    this._view.title.setColor(this.options.color);
          that._view.title.text = this.options.subtitle;
          that._view.description.text=this.options.description ? this.options.description : "";
          that._view.duration.text = Moment.unix(this.options.duration).utc().format('HH:mm:ss');
          */
-        AudioPlayer && AudioPlayer.release();
+        AudioPlayer.release();
         //
 
         AudioPlayer.seek(time);
@@ -216,6 +224,7 @@ var $ = function(options) {
         AudioPlayer.addEventListener('complete', this.onCompleteFn);
         AudioPlayer.addEventListener('change', this.onStatusChangeFn);
         that._window.addEventListener("android:back", () => {
+            console.log("android-back");
             that._view.control.fireEvent('longpress', {});
             return false;
         });
@@ -226,6 +235,7 @@ var $ = function(options) {
         console.log("Overlay added");
 
         that._view.control.addEventListener('longpress', function() {
+            console.log("longpress");
             that.stopPlayer();
         });
         that._view.control.addEventListener('singletap', function() {

@@ -7,7 +7,7 @@ var toType = function(obj) {
 	return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 };
 
-var url = 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:searchterm=NEEDLE&drau:page=1&drau:limit=300';
+const URL = 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:searchterm=NEEDLE&drau:page=1&drau:limit=300';
 
 var stations = {
 	4 : 'dlf',
@@ -21,12 +21,13 @@ module.exports = function() {
 		var xhr = Ti.Network.createHTTPClient({
 			timeout : 30000,
 			onload : function() {
+			    var start = new Date().getTime();
 				var payload = new XMLTools(this.responseXML).toObject();
+				console.log("parseTime: " + (new Date().getTime()-start));
 				var items = payload.item;
 				if (items && toType(items) != 'array') {
 					items = [items];
 				}
-				console.log(items);
 				if (items == undefined) {
 					args.done({
 						items : [],
@@ -36,15 +37,16 @@ module.exports = function() {
 				}
 				args.done({
 					items : items.map(function(item) {
-						return {
+					 	return {
 							pubdate : Moment(item.datetime).format('DD.MM.YYYY HH:mm'),
 							title : item.title,
 							author : item.author,
 							sendung : item.sendung.text,
+							sendung_id : item.sendung.id,
 							url : item.url,
 							image : '/images/' + stations[item.station] + '.png',
 							station : stations[item.station],
-							duration : item.duration,
+							duration : 1000*item.duration,
 							color : Model[stations[item.station]].color
 						};
 					}),
@@ -52,7 +54,7 @@ module.exports = function() {
 				});
 			}
 		});
-		xhr.open('GET', url.replace('NEEDLE', encodeURIComponent(args.needle)));
+		xhr.open('GET', URL.replace('NEEDLE', encodeURIComponent(args.needle)));
 		xhr.send();
 	} else {
 		var link = Ti.Database.open(DB);

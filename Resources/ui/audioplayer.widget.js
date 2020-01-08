@@ -2,16 +2,18 @@ var start = new Date().getTime();
 var $ = function(props) {
     if (!props)
         props = {};
-    console.log("||||||| START RENDERING OVERLAY ||||||||");
+   
     console.log(props);
     var color = (props.color) ? props.color : 'white';
     var $ = Ti.UI.createView({
         backgroundColor : '#88000000',
+        touchEnabled:false
 
     });
     $.topcontainer = Ti.UI.createView({
         top : 0,
-        layout : "vertical"
+        layout : "vertical",
+        touchEnabled:false
     });
     if (props.image) {
         $.add(Ti.UI.createImageView({
@@ -26,7 +28,7 @@ var $ = function(props) {
    
     $.add($.visualizerContainer);
     $.container = Ti.UI.createView({
-        bubbleParent : false,
+       
         touchEnabled : false,
         height : 230,
         zIndex : 99,

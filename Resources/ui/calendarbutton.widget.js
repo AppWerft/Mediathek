@@ -1,4 +1,5 @@
 const Moment = require('vendor/moment');
+Moment.locale("de");
 
 module.exports = function(parent,cb) {
     const currentDate = parent.date;
@@ -42,10 +43,11 @@ module.exports = function(parent,cb) {
             minDate : new Date(2015, 0, 1),
             maxDate : Moment().toDate(),
             value : currentDate.toDate(),
-            locale : 'de'
+            locale : 'de-DE'
         });
         $.picker.showDatePickerDialog({
             value : Moment().toDate(),
+            locale : 'de-DE',
             callback : function(e) {
                
                 if (!e.cancel) {

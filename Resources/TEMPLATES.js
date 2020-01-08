@@ -743,7 +743,7 @@ exports.search = {
 		properties : {
 			left : 0,
 			touchEnabled : false,
-			top : 0,
+			top : 10,
 			width : 70,
 			height : 70
 		}
@@ -782,6 +782,7 @@ exports.search = {
 			width : Ti.UI.FILL,
 			layout : 'vertical',
 			left : 85,
+			height : Ti.UI.SIZE,
 			top : 0,
 			right : 15,
 			bottom : 10
@@ -805,7 +806,7 @@ exports.search = {
 			bindId : 'author',
 			properties : {
 				left : 0,
-				top : 10,
+				top : 5,
 				height : Ti.UI.SIZE,
 				touchEnabled : false,
 				font : {
@@ -831,6 +832,7 @@ exports.search = {
 		}, {
 			type : 'Ti.UI.Label',
 			bindId : 'pubdate',
+			height : Ti.UI.SIZE,
 			properties : {
 				left : 0,
 				top : 0,
@@ -847,7 +849,7 @@ exports.search = {
 			bindId : 'sendung',
 			properties : {
 				left : 0,
-				top : 0,
+				top : 5,
 				height : Ti.UI.SIZE,
 				touchEnabled : false,
 				font : {
@@ -859,8 +861,6 @@ exports.search = {
 		}]
 	}]
 };
-
-
 
 exports.recents = {
 	properties : {

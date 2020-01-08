@@ -162,6 +162,7 @@ module.exports = function(_args) {
             });
         }
     };
+    
     $.mainList.addEventListener('itemclick', onitemclickFunc);
     $.mainList.addEventListener('scrollstart', () => $.calendarButton.hide());
     $.mainList.addEventListener('scrollend', () => $.calendarButton.show());

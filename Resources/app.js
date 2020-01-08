@@ -6,18 +6,7 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
     });
 
     $.createAndStartPlayer = function(_args) {
-        var start = new Date().getTime();
-        var PlayerOverlay = require('ui/audioplayer.window').createAndStartPlayer(_args);
-        /* $.add(PlayerOverlay);
-         PlayerOverlay.oncomplete = function() {
-         try {
-         $.remove(PlayerOverlay);
-         PlayerOverlay = null;
-         } catch(E) {
-         console.log(E);
-         }
-         };*/
-        console.log('Info: constructTime for player: ' + (new Date().getTime() - start));
+        require('ui/audioplayer.window').createAndStartPlayer(_args);
     };
     $.addEventListener('open',() => {
         Global.АктйонБар.title = "DeutschlandRadio Mediathek";
@@ -61,7 +50,9 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
                 pages.push(require('ui/nova/index.page')(opts));
         };
         $.Drawer = Ti.UI.Android.createDrawerLayout({
-            leftView : require('ui/drawer/drawer.widget')(),
+            leftView : require('ui/drawer/leftdrawer.widget')($),
+            rightView : require('ui/drawer/rightdrawer.widget')(),
+            
             centerView : FlipModule.createFlipView({
                 orientation : FlipModule.ORIENTATION_HORIZONTAL,
                 overFlipMode : FlipModule.OVERFLIPMODE_GLOW,

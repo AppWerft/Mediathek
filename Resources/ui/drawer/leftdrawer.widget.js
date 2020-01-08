@@ -1,6 +1,8 @@
-module.exports = function() {
+const lila = '#5933AC';
+
+module.exports = function(parent) {
     const $ = Ti.UI.createScrollView({
-        backgroundColor : '#5933AC',
+        backgroundColor : lila,
         layout : 'vertical',
         scrollType : 'vertical'
 
@@ -11,25 +13,41 @@ module.exports = function() {
         height: 'auto',
         top : 0
     }));
+    /*SUCHE*/
+   $.searchRow = Ti.UI.createView({
+        top : 0,
+        backgroundColor : lila,
+        height : 50
+    });
+    $.searchRow.add(Ti.UI.Android.createSearchView({
+        color : '#fff',
+        hintText : "Suche …"
+    }));
+    $.add($.searchRow);
+    $.searchRow.children[0].addEventListener("submit", e => {
+        console.log("submit on search");
+        parent.Drawer.toggleLeft();
+        require('ui/searchresult.window')(e.source.value).open();
+    });
+    
     $.add(Ti.UI.createLabel({
         top : 5,
         left : 10,
         textAlign : 'left',
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
-        text : "Einstellungen",
+        text : "Einstellungen (noch nicht wirksam)",
         color : 'white',
         font : {
             fontWeight : 'bold',
-            fontSize : 22,
+            fontSize : 20,
             fontFamily:'Aller'
         }
     }));
-    $.add(require('ui/drawer/wifi')());
     $.add(require('ui/drawer/removeafterdownload')());
     $.add(require('ui/drawer/sd')());
     $.add(require('ui/drawer/schlummer')());
-    $.add(require('ui/drawer/playlist')());
+  //  $.add(require('ui/drawer/playlist')());
     $.add(Ti.UI.createLabel({
         top : 5,
         left : 10,
@@ -40,7 +58,7 @@ module.exports = function() {
         color : 'white',
         font : {
             fontWeight : 'bold',
-            fontSize : 22,
+            fontSize : 20,
             fontFamily:'Aller'
         }
     }));
@@ -69,7 +87,6 @@ module.exports = function() {
         top : 10,
          left : 10,
         right:10,
-        
         text : "Für den Offlinebetrieb müssen die Sendungen lokal gespeichert werden. Um die Verschwendung des (engbemessenen) internen Speichers zu schonen, wird versucht die Daten auf der externen Karte zu speichern. Dazu braucht das System diese EXTERNALSTORAGE-Zugriffsberechtigung.\n\n\n",
          font : {
             fontWeight : 'normal',
