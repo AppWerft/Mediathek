@@ -5,9 +5,10 @@ const StorageAdapter = require('controls/storage.adapter'),
     Stations = require('model/stations'),
     playerViewModule = require('ui/audioplayer.widget'),
     Permissions = require('vendor/permissions'),
-    AudioVisualizer = require('ti.audiovisualizerview'),
     TelephonyManager = require('com.goyya.telephonymanager'),
+    AudioNotification = require("de.appwerft.audionotification"),
     timeout = null,
+    Settings = require("controls/settings"),
     TIMEOUT = 30000;
 
 TelephonyManager.addEventListener('callState', function(_e) {
@@ -18,10 +19,9 @@ TelephonyManager.addEventListener('callState', function(_e) {
 var AudioPlayer = Ti.Media.createAudioPlayer({
     allowBackground : true,
     volume : 1.0,
-    seeked : false,
-    audioFocus : true
+    durationRefreshed : false,
+    audioFocus : Settings.get("AUDIOFOCUS")
 });
-AudioPlayer.release();
 
 console.log("📻AudioPlayer created");
 
@@ -33,6 +33,9 @@ var alertactive = false;
 /* ********************************************************* */
 var $ = function(options) {
     const that = this;
+    AudioPlayer.release();
+    AudioPlayer.durationRefreshed = false;
+
     that.Gears = require('ui/gears.widget')(options.station);
     that.Gears.animate({
         bottom : 0
@@ -75,8 +78,11 @@ var $ = function(options) {
         that._view.duration.text = Moment(_e.progress).utc().format(FORMAT) + ' / ' + Moment(that.options.duration).utc().format(FORMAT);
         /* saving to model */
         that.Storage.setProgress(_e.progress);
-        // updating ControlView
-
+        if (options.duration) {
+            const progress = _e.progress / options.duration;
+            console.log("progress=" + progress);
+            that.Notification.setProgress(progress);
+        }
     };
     that.onCompleteFn = _e => {
         console.log("📻onCompleteFn success=" + _e.success);
@@ -88,21 +94,24 @@ var $ = function(options) {
                 duration : 3000
             }).show();
         console.log("Progress: " + that.progress / 1000);
-        console.log("Duration: " + AudioPlayer.duration / 1000);
+        //console.log("Duration: " + AudioPlayer.duration / 1000);
         console.log("DL-Progress: " + that.Storage.status.downloadprogress / 1000);
-
-        if (that.Storage.status.downloadprogress > AudioPlayer.duration / 1000 + 1) {
+        console.log("AudioPlayer.durationRefreshed: " + AudioPlayer.durationRefreshed)
+        const progress = that.progress / that.Storage.status.downloadprogress;
+        if (progress < 0.9) {
             console.log("false complete => restart with new duration");
-            AudioPlayer && AudioPlayer.release();
-            AudioPlayer.seek(that.progress + 500);
+            const duration = AudioPlayer.duration;
+            AudioPlayer.release();
+            AudioPlayer.seek(duration);
             AudioPlayer.url = that.nativePath;
             AudioPlayer.start();
             Ti.UI.createNotification({
-                message : "Internet-Schluckauf"
+                message : "Internet-Schluckauf",
+                duration : 100
             }).show();
             return;
         }
-
+        console.log("es ist ernst !!!");
         if (that._view)
             that._view.setVisible(false);
         that.Storage.setComplete();
@@ -116,7 +125,7 @@ var $ = function(options) {
         that.Storage.removeEventListener("ACTION_READYTOPLAY", that.onReadyToPlayFn);
         that.Storage.removeEventListener("ACTION_READYTOSEEK", that.onReadyToSeekFn);
         that.Storage.removeEventListener("ACTION_BUFFERINGSTARTED", that.onBufferingStartedFn);
-
+        //AudioPlayer.durationRefreshed = false;
         that.Storage = null;
         that._view.mVisualizerView = null;
         AudioPlayer && AudioPlayer.release();
@@ -152,6 +161,7 @@ var $ = function(options) {
         case 'playing':
             that._view.slider.removeEventListener('change', that.onSliderChangeFn);
             that._view.progress.show();
+            that._view.control.setImage('/images/pause.png');
             that._view.slider.hide();
             //that._view.subtitle.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
             //  that._view.sendung.ellipsize = Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE;
@@ -177,6 +187,7 @@ var $ = function(options) {
         AudioPlayer.removeEventListener('progress', that.onProgressFn);
         AudioPlayer.removeEventListener('complete', that.onCompleteFn);
         AudioPlayer.removeEventListener('change', that.onStatusChangeFn);
+        that.Notification.stop();
     };
     that.startPlayer = (audioFile, time) => {
         if (!audioFile) {
@@ -187,13 +198,12 @@ var $ = function(options) {
         if (!time)
             time = 0;
 
-        
-         var maxRange = that.options.duration ;
-         that._view.progress.setMax(maxRange);
-         that._view.slider.setMax(maxRange);
-         that._view.progress.value = 0;
-         that._view.slider.value = 0;
-         /*
+        var maxRange = that.options.duration;
+        that._view.progress.setMax(maxRange);
+        that._view.slider.setMax(maxRange);
+        that._view.progress.value = 0;
+        that._view.slider.value = 0;
+        /*
          that._view.sendung.text = this.options.title;
          //    this._view.title.setColor(this.options.color);
          that._view.title.text = this.options.subtitle;
@@ -223,7 +233,7 @@ var $ = function(options) {
         AudioPlayer.addEventListener('progress', this.onProgressFn);
         AudioPlayer.addEventListener('complete', this.onCompleteFn);
         AudioPlayer.addEventListener('change', this.onStatusChangeFn);
-        that._window.addEventListener("android:back", () => {
+        that._window.addEventListener("androidback", () => {
             console.log("android-back");
             that._view.control.fireEvent('longpress', {});
             return false;
@@ -238,48 +248,43 @@ var $ = function(options) {
             console.log("longpress");
             that.stopPlayer();
         });
-        that._view.control.addEventListener('singletap', function() {
-            /*
-             if (CacheAdapter.isCached(that.options)) {
-             if (AudioPlayer.playing)
-             AudioPlayer.pause();
-             else {
-             that.progress = that._view.slider.getValue();
-             AudioPlayer.seek(that.progress);
-             AudioPlayer.play();
-             }
-             }*/
+        that._window.addEventListener('swipe', function(e) {
+            if (e.direction == 'up' || e.direction == 'down' && e.y>100)
+                that.stopPlayer();
         });
-
+        that._view.control.addEventListener('singletap', function() {
+            if (AudioPlayer.playing)
+                 AudioPlayer.pause();
+            else {
+                 that.progress = that._view.slider.getValue();
+                AudioPlayer.seek(that.progress);
+                    AudioPlayer.play();
+            }
+        });
         this._window.addEventListener('open', function() {
+            console.log(options)
+            that.Notification = AudioNotification.createNotification({
+                icon : 'smallicon',
+                lifecycleContainer : that._window,
+                title : options.title,
+                progress : 0.0,
+                subtitle : options.subtitle
+            });
+            that.Notification.setLargeIcon("/images/" + options.station + '.png');
+            that.Notification.update();
             console.log("window is open");
             function onLoad(props) {
-                console.log(props.progress + '    ' + props.uri);
                 that.startPlayer(props.uri, props.progress);
-                clearInterval(that.cron);
             }
 
             Permissions.requestPermissions(['WRITE_EXTERNAL_STORAGE'], _success => {
                 if (_success) {
                     that.Storage.loadFile(that.options, onLoad);
                     Permissions.requestPermissions(['RECORD_AUDIO'], _success => {
-                        if (_success) {
-                            const visualizerView = AudioVisualizer.createView({
-                                audioSessionId : 0,
-                                linegraphRenderer : {
-                                    strokeWidth : 0.7 * Ti.Platform.displayCaps.logicalDensityFactor
-                                },
-                                bargraphRenderer : {
-                                    barWidth : Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor / 7 * Ti.Platform.displayCaps.logicalDensityFactor,
-                                    color : that.options.color,
-                                    divisions : 9
-                                },
-                                touchEnabled : false,
-                                lifecycleContainer : that._window,
-                            });
-                            that._view.add(visualizerView);
-                            console.log("that._view.visualizerView created");
-                        }
+                        const id = AudioPlayer.getAudioSessionId( );
+                        var Zappler = require("ui/visualizer.widget")(that._window,that.options.color,id);
+                       
+                        !!_success && that._view.add(Zappler);
                     });
                 }
             });

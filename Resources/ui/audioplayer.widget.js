@@ -2,8 +2,6 @@ var start = new Date().getTime();
 var $ = function(props) {
     if (!props)
         props = {};
-   
-    console.log(props);
     var color = (props.color) ? props.color : 'white';
     var $ = Ti.UI.createView({
         backgroundColor : '#88000000',
@@ -25,10 +23,8 @@ var $ = function(props) {
             image : props.image
         }));
     }
-   
     $.add($.visualizerContainer);
     $.container = Ti.UI.createView({
-       
         touchEnabled : false,
         height : 230,
         zIndex : 99,

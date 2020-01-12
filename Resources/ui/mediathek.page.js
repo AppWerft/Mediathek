@@ -1,5 +1,7 @@
 var Favs = new (require('controls/favorites.adapter'))(),
-    Model = require('model/stations');
+    Model = require('model/stations'),
+    Settings = require("controls/settings");
+
 var Moment = require('vendor/moment');
 Moment.locale('de');
 
@@ -137,7 +139,8 @@ module.exports = function(_args) {
             item.fav.opacity = isfav ? 0.8 : 0.5;
             _e.section.updateItemAt(_e.itemIndex, item);
         } else if (_e.bindId && _e.bindId == 'share') {
-            Ti.Media.vibrate(1, 0);
+            if (Settings.get("VIBRATION"))
+                Ti.Media.vibrate(1, 0);
             require('ui/sharing.chooser')(function(_type) {
                 require('vendor/socialshare')({
                     type : _type,
@@ -147,8 +150,10 @@ module.exports = function(_args) {
                 });
             });
         } else if (_e.bindId && _e.bindId == 'playtrigger') {
+
             var data = JSON.parse(_e.itemId);
-            Ti.Media.vibrate([1, 1]);
+            if (Settings.get("VIBRATION"))
+                Ti.Media.vibrate([1, 1]);
             _args.window.createAndStartPlayer({
                 color : _args.color,
                 url : data.url,
@@ -162,7 +167,7 @@ module.exports = function(_args) {
             });
         }
     };
-    
+
     $.mainList.addEventListener('itemclick', onitemclickFunc);
     $.mainList.addEventListener('scrollstart', () => $.calendarButton.hide());
     $.mainList.addEventListener('scrollend', () => $.calendarButton.show());

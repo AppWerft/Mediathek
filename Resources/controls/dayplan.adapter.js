@@ -1,7 +1,6 @@
 var Moment = require('vendor/moment'),
     XMLTools = require('vendor/XMLTools'),
-    Stations = require('model/stations'),
-    Soup = require("de.appwerft.soup");
+    Stations = require('model/stations');
 Moment.locale('de   ');
 
 var $ = function() {

@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.1
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
+description: environmentsensors
+author: Rainer Schleevoigt
+license: Specify your license
+copyright: Copyright (c) 2020 by Your Company
+
+# these should not be edited
+name: environmentsensors
+moduleid: ti.environmentsensors
+guid: 24bec116-58fa-4ce5-ad17-9fe69ffdc76b
+platform: android
+minsdk: 8.0.0.

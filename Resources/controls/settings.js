@@ -1,9 +1,15 @@
-const DEPOT = "SETTINGS";
+const DEPOT = "SETTINGS9";
 
 const DEFAULTS = {
     REMOVEAFTERDOWNLOAD : false,
     SD : true,
-    SCHLUMMER : false,
+    AUDIOFOCUS : true,
+    SCHLUMMER : true,
+    VISULINE : true,
+    VISUBAR : true,
+    VIBRATION : true,
+    LONGPRESS :false,
+    SWIPE : false
 };
 
 if (!Ti.App.Properties.hasProperty(DEPOT))

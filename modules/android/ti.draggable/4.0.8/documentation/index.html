@@ -1,0 +1,120 @@
+<h1>TiDraggable - Native Draggable Views</h1>
+
+<p>An enhanced fork of the original <a href="https://github.com/pec1985/TiDraggable">TiDraggable</a> module by <a href="http://twitter.com/pecdev">Pedro</a> <a href="https://github.com/pec1985">Enrique</a>, allows for simple creation of &quot;draggable&quot; views.</p>
+
+<h2>Enhancements &amp; Fixes</h2>
+
+<ul><li>Improved drag performance for iOS and Android.</li><li>Updated public APIs for more seamless integration.</li><li>Removed the InfiniteScroll class as it doesn&#39;t really have much to do with the overall module.</li><li>Removed unnecessary APIs to reduce overall module footprint.</li><li>Removed unused variables and organized imports.</li><li>Added ability to unset boundaries.</li><li>Mapped the missing <code>cancel</code> gesture to the <code>end</code> gesture (firing the respective event).</li><li>Added <code>ensureRight</code> and <code>ensureBottom</code>, this allows for stable dragging of views where the dimensions are not known.</li><li>Added <code>enabled</code> boolean property for toggeling drag</li><li>Views can be mapped and translated with a draggable view.</li><li>Draggable implementation now has its own configurable property called <code>draggable</code>.</li><li>iOS: Supports all Ti.UI.View subclasses and Ti.UI.View wrapped views (View, Window, Label)</li><li>Android: Fixed a bug where touch events were not correctly passed to children or bubbled to the parent.</li><li>Android: Fixed a bug where min and max bounds were being incorrectly reported after being set.</li><li>Android: Improved drag tracking. It plays nice with child views now.</li><li>Android: Added a touch threshold to ensure all child views have a chance to have their respective events fired.</li></ul>
+
+<h2>Usage</h2>
+
+<p><code></code>`javascript
+var Draggable = require(&#39;ti.draggable&#39;),
+    mainWindow = Ti.UI.createWindow({
+        backgroundColor : &#39;white&#39;
+    }),
+    draggableView = Draggable.createView({
+        width : 100,
+        height : 100,
+        backgroundColor : &#39;black&#39;
+    });</p>
+
+<p>mainWindow.add(draggableView);
+mainWindow.open();
+<code></code>`</p>
+
+<blockquote><p>If you are building the Android module, make sure you update the .classpath and build.properties files to match your setup.</p></blockquote>
+
+<h2>Module Reference</h2>
+
+<h3>Draggable.createView(viewOptions);</h3>
+
+<p>Create a draggable view. All of Titanium&#39;s properties are supported along the additional <code>draggableConfig</code> property containing any options that should be set upon creation. See <a href="#options">Options</a></p>
+
+<blockquote><p>When the draggable proxy is created a new property is set called <code>draggable</code> which stores all the configuration properties and allows for options to be updated after creation.</p></blockquote>
+
+<p><strong>iOS Notes</strong>
+You can pass almost all of iOS&#39; supported Ti.UI creation methods to the draggable module such as <code>Draggable.createView( ... )</code> or <code>Draggable.createWindow( ... )</code>. While <code>Ti.UI.View</code> and <code>Ti.UI.Window</code> are fully supported on iOS other APIs haven&#39;t been fully tested.</p>
+
+<p><strong>Android Notes</strong>
+Android only supports the creation of Ti.UI.Views. At this time there are no plans to add support for other APIs.</p>
+
+<h2>Options</h2>
+
+<p>Options can be set on view creation using <code>draggableConfig</code> or after creation using <code>DraggableView.draggable.setConfig( ... )</code></p>
+
+<hr/>
+
+<p>The <code>setConfig</code> method can set options two different ways. You can pass an <code>object</code> containing the parameters you with to set or you can pass a key-value pair.</p>
+
+<p><strong>Setting Options With An Object</strong>
+<code>javascript
+DraggableView.draggable.setConfig(&#39;enabled&#39;, false);
+</code></p>
+
+<p><strong>Setting Options With An Object</strong>
+<code>javascript
+DraggableView.draggable.setConfig({
+  enabled : false
+});
+</code></p>
+
+<hr/>
+
+<h3><code>Boolean</code> - enabled</h3>
+
+<p>Flag to enable or disable dragging.</p>
+
+<h3><code>Number</code> - minLeft</h3>
+
+<p>The left-most boundary of the view being dragged. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Number</code> - maxLeft</h3>
+
+<p>The right-most boundary of the view being dragged. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Number</code> - minTop</h3>
+
+<p>The top-most boundary of the view being dragged. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Number</code> - maxTop</h3>
+
+<p>The bottom-most boundary of the view being dragged. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Boolean</code> - ensureRight</h3>
+
+<p>Ensure that that the <code>right</code> edge of the view being dragged keeps its integrity. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Boolean</code> - ensureBottom</h3>
+
+<p>Ensure that that the <code>bottom</code> edge of the view being dragged keeps its integrity. Can be set to <code>null</code> to disable property.</p>
+
+<h3><code>Array</code> - maps</h3>
+
+<p>An array of views that should be translated along with the view being dragged. See <a href="#view-mapping">View Mapping</a>.</p>
+
+<h2>View Mapping</h2>
+
+<p>In the case where you want multiple views to be translated at the same time you can pass the <code>maps</code> property to the draggable config. This functionality is useful for creating parallax or 1:1 movements.</p>
+
+<p>The <code>maps</code> property accepts an array of objects containing any of the following. The <code>view</code> property is required.</p>
+
+<h3>Map Options</h3>
+
+<h3><code>Ti.UI.View</code> - view</h3>
+
+<p>The view to translate.</p>
+
+<h3><code>Number</code> - parallaxAmount</h3>
+
+<p>A positive or negative number. Numbers less than <code>|1|</code> such as <code>0.1</code>, <code>0.2</code>, or <code>0.3</code> will cause the translation to move <em>faster</em> then the translation. A <code>parallaxAmount</code> of 1 will translate mapped views 1:1. A parallaxAmount <code>&gt; 1</code> will result in a slower translation.</p>
+
+<h3><code>Object</code> - constrain</h3>
+
+<p>An object containing the boundaries of the mapped view. Can have the following:</p>
+
+<ul><li><strong>x</strong><ul><li><strong>start</strong> The start position for the mapped view.</li><li><strong>end</strong> The end position for the mapped view.</li><li><strong>callback</strong> A function that will receive the completed percentage of the mapped translation. . Android does not support this option.</li><li><strong>fromCenter</strong> Translate the view from its center. Android does not support this option.</li></ul></li><li><strong>y</strong><ul><li><strong>start</strong> The start position for the mapped view.</li><li><strong>end</strong> The end position for the mapped view.</li><li><strong>callback</strong> A function that will receive the completed percentage of the mapped translation. . Android does not support this option.</li><li><strong>fromCenter</strong> Translate the view from its center. Android does not support this option.</li></ul></li></ul>
+
+<h2>Credits &amp; Notes</h2>
+
+<p>The work is largely based on <a href="http://twitter.com/pecdev">Pedro</a> <a href="https://github.com/pec1985">Enrique&#39;s</a> <a href="https://github.com/pec1985/TiDraggable">TiDraggable</a> module license under the MIT (V2) license.</p>

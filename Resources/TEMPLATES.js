@@ -810,7 +810,7 @@ exports.search = {
 				height : Ti.UI.SIZE,
 				touchEnabled : false,
 				font : {
-					fontSize : 12,
+					fontSize : 14,
 					fontFamily : 'Aller'
 				},
 				color : '#333'
@@ -824,7 +824,7 @@ exports.search = {
 				height : Ti.UI.SIZE,
 				touchEnabled : false,
 				font : {
-					fontSize : 12,
+					fontSize : 14,
 					fontFamily : 'Aller'
 				},
 				color : '#333'
@@ -839,7 +839,7 @@ exports.search = {
 				height : Ti.UI.SIZE,
 				touchEnabled : false,
 				font : {
-					fontSize : 12,
+					fontSize : 14,
 					fontFamily : 'Aller'
 				},
 				color : '#333'

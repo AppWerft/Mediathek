@@ -2,42 +2,14 @@ const Global = require('global');
 const FlipModule = require('de.manumaticx.androidflip'); ! function() {
 
     const $ = Ti.UI.createWindow({
-        fullscreen : true
+       // fullscreen : true,
+        navBarHidden: false,
+         theme : "Theme.AppCompat.Light.DarkActionBar"
     });
-
-    $.createAndStartPlayer = function(_args) {
-        require('ui/audioplayer.window').createAndStartPlayer(_args);
-    };
-    $.addEventListener('open',() => {
-        Global.АктйонБар.title = "DeutschlandRadio Mediathek";
-        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
-        Global.АктйонБар.titleFont = "ScalaSansBold";
-        Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
-        Global.АктйонБар.subtitleColor = "#eee";
-
-        $.activity.actionBar.displayHomeAsUp = true;
-        $.activity.actionBar.onHomeIconItemSelected = function() {
-            $.Drawer.toggleLeft();
-        };
-        $.activity.onCreateOptionsMenu = function(_menuevent) {
-            _menuevent.menu.clear();
-            _menuevent.menu.add({
-                title : 'Start live Radio',
-                itemId : 1,
-                icon : '/images/playbutton.png', ///Ti.App.Android.R.drawable['ic_action_play'],
-                showAsAction : Ti.Android.SHOW_AS_ACTION_IF_ROOM,
-            }).addEventListener("click", function() {
-                const station = {
-                    name : Global.Stations[Global.currentStation].name,
-                    color : Global.Stations[Global.currentStation].color,
-                    stream : Global.Stations[Global.currentStation].stream,
-                    station : Global.currentStation
-                };
-                require('liveradio/radioplayer.window')(station).open();
-            });
-        };
-        var pages = [];
-        for (var station in Global.Stations) {
+    
+    $.addEventListener('open',require('ui/main.menu'));
+     var pages = [];
+     for (var station in Global.Stations) {
             const opts = {
                 station : station,
                 window : $,
@@ -69,12 +41,12 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
                     Global.currentStation = k;
                 }
             });
-
-            Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
-            Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
-            Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
-            Global.АктйонБар.statusbarColor = Global.Stations[Global.currentStation].darkcolor;
-            Ti.App.Properties.setString('LAST_STATION', Global.currentStation);
+        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+        Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
+        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+        Global.АктйонБар.statusbarColor = Global.Stations[Global.currentStation].darkcolor;
+      
+             Ti.App.Properties.setString('LAST_STATION', Global.currentStation);
         });
         $.Drawer.centerView.flipToView($.Drawer.centerView.views[Global.currentPage]);
        
@@ -86,6 +58,9 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
         $.add($.Drawer);
        
          Ti.App.Properties.setBool("LL",true);   
-    });
+   // });
     $.open();
+    $.createAndStartPlayer = function(_args) {
+        require('ui/audioplayer.window').createAndStartPlayer(_args);
+    };
 }();

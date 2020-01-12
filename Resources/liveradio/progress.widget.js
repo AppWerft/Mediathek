@@ -1,9 +1,12 @@
 const PADD = 50;
+const SCREENWIDTH = Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor;
+
 module.exports = function(props) {
     const $ = Ti.UI.createView({
         height : 20,
         left : 15,
         top : 8,
+        bottom:8,
         right : 15,
         backgroundColor : 'transparent'
     });

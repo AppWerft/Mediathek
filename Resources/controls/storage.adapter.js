@@ -1,9 +1,11 @@
 const Moment = require('vendor/moment'),
-    Model = require('model/stations'),
-    FFmpeg = require("ti.ffmpeg"),
-    FOLDER = 'RadioCache',
-    FORCED = false;
-BUFFER_TIME = 10000;
+    Settings = require("controls/settings");
+Model = require('model/stations'),
+FFmpeg = require("ti.ffmpeg"),
+FFmpegLoader = require("controls/ffmpeg.loader"),
+FOLDER = 'RadioCache',
+FORCED = false;
+BUFFER_TIME = 2000;
 //5 sec.
 
 var start = new Date().getTime();
@@ -14,10 +16,15 @@ function LOG(foo) {
     console.log(foo);
 }
 
-if (Ti.Filesystem.isExternalStoragePresent())
-    var DEPOT = Ti.Filesystem.externalStorageDirectory;
-else
-    var DEPOT = Ti.Filesystem.applicationDataDirectory;
+var DEPOT;
+if (Settings.get("SD")) {
+    if (Ti.Filesystem.isExternalStoragePresent())
+        DEPOT = Ti.Filesystem.externalStorageDirectory;
+    else
+        DEPOT = Ti.Filesystem.applicationDataDirectory;
+} else
+    DEPOT = Ti.Filesystem.applicationCacheDirectory;
+
 var folder = Ti.Filesystem.getFile(DEPOT, FOLDER);
 
 if (!folder.exists()) {
@@ -155,21 +162,40 @@ $.prototype = {
             }
             LOG("START HLS DOWNLOADING");
             this.fireEvent("ACTION_BUFFERINGSTARTED", {});
-            const client = FFmpeg.createHLSClient();
-            // during download this will called every second:
-            client.setInput(this.url).setAudiocodec(FFmpeg.CODEC_MP3).setFile(this.localfile).setOverwrite(true);
-            client.addEventListener("onProgress", onHLSProgress);
-            client.execute();
-            client.onFinish = p => {
-                client.removeEventListener("onProgress", onHLSProgress);
-                if (!this.status.started)
-                    this.fireEvent("ACTION_READYTOPLAY", this.getState());
-                this.status.started = true;
-                const link = Ti.Database.open(DB);
-                link.execute("UPDATE recents SET status=? WHERE url=?", 8, this.url);
-                link.close();
-                this.fireEvent("ACTION_READYTOSEEK", {});
+            const startHLSFn = () => {
+                Ti.UI.createNotification({
+                    message : "Architektur:\n"+FFmpeg.getABI(),
+                    duration : 5000
+                }).show();
+                const client = FFmpeg.createHLSClient();
+                // during download this will called every second:
+                client.setInput(this.url).setAudiocodec(FFmpeg.CODEC_MP3).setFile(this.localfile).setOverwrite(true);
+                client.addEventListener("onProgress", onHLSProgress);
+                client.execute();
+                client.onFinish = p => {
+                    const link = Ti.Database.open(DB);
+                    client.removeEventListener("onProgress", onHLSProgress);
+                    if (!this.status.started)
+                        this.fireEvent("ACTION_READYTOPLAY", this.getState());
+                    this.status.started = true;
+                    link && link.execute("UPDATE recents SET status=? WHERE url=?", 8, this.url);
+                    link && link.close();
+                    this.fireEvent("ACTION_READYTOSEEK", {});
+                }
             }
+            if (false && FFmpegLoader.isLoaded()) {
+                console.log("FFmpeg direct loaded, can start");
+                startHLSFn();
+            } else {
+                Ti.UI.createNotification({
+                    duration : 1000,
+                    message : "Streamingkonverter wird installiert."
+                }).show();
+                FFmpegLoader.load({
+                    onload : startHLSFn
+                });
+            }
+
             // global in this method for dlm callback
             link.execute('INSERT OR REPLACE INTO recents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', //
             this.url, //
@@ -206,7 +232,11 @@ $.prototype = {
     },
     setComplete : function(_progress) {
         var link = Ti.Database.open(DB);
-        //link.execute('UPDATE recents SET progress=duration,lastaccess=? WHERE url =?', Moment().toISOString(), this.url);
+        link.execute('UPDATE recents SET progress=0,lastaccess=? WHERE url =?', Moment().toISOString(), this.url);
+        if (Settings.get("REMOVEAFTERDOWNLOAD")) {
+            link.execute('UPDATE recents SET status=0 WHERE url =?', this.url);
+            this.localfile.deleteFile();
+        }
         link.close();
     },
     isComplete : function() {

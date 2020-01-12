@@ -1,24 +1,33 @@
 var Model = require('model/stations'),
     Moment = require('vendor/moment'),
+    Settings = require("controls/settings"),
     Search = require('controls/search.adapter'),
     АктйонБар = require('com.alcoapps.actionbarextras');
 Gears = require('ui/gears.widget')();
-Gears.bottom = undefined;
+Gears.bottom = 0;
+Gears.left = 0;
 
 module.exports = function(needle) {
-
+    var total = 0;
     const onOpenFn = function(_event) {
-        console.log(">>>> window opened");
+
         АктйонБар.setTitle('DLF Suche');
-        АктйонБар.setSubtitle('Suche nach „' + needle + '“');
+        АктйонБар.subtitle = 'Suche nach „' + needle + '“';
         АктйонБар.setFont("Aller");
         АктйонБар.setBackgroundColor('#5933AC');
         var activity = _event.source.getActivity();
         if (activity) {
             activity.onCreateOptionsMenu = function(_menuevent) {
-                _menuevent.menu.clear();
+                var µ = _menuevent.menu;
+                µ.clear();
                 activity.actionBar.displayHomeAsUp = true;
+
+                $.menuItem = µ.add({
+                    actionView : $.searchView,
+                    showAsAction : Ti.Android.SHOW_AS_ACTION_IF_ROOM | Ti.Android.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
+                });
             };
+
             activity.actionBar.onHomeIconItemSelected = function() {
                 $.close();
             };
@@ -29,7 +38,8 @@ module.exports = function(needle) {
 
     const onitemclickFn = (event) => {
         var data = JSON.parse(event.itemId);
-        Ti.Media.vibrate([1, 1]);
+        if (Settings.get("VIBRATION"))
+            Ti.Media.vibrate([1, 1]);
         require('ui/audioplayer.window').createAndStartPlayer({
             url : data.url,
             duration : data.duration,
@@ -45,17 +55,25 @@ module.exports = function(needle) {
     }
     const setDataintoSectionFn = function(_res) {
         $.remove(Gears);
-        var total = _res.items.length;
-        if (total > 0) {
-            Ti.UI.createNotification({
-                duration : 5000,
-                message : 'Suche nach ' + needle + ' ergab „' + total + '“ Treffer.'
-            }).show();
-            var items = [];
-            _res.items.forEach(function(item) {
+        if (_res.count > 0) {
+            var sec = Math.round(_res.duration / 1000);
+            /* Ti.UI.createNotification({
+             duration : 10000,
+             message : 'Suche nach ' + needle + ' ergab „' + _res.count + '“ Treffer.\nDer Server brauchte ' + sec + ' sec. um das rauszusuchen'
+             }).show();*/
+            total += _res.count;
+            if (_res.page == 1)
+                $.add(require('ui/filterbutton.widget')(function() {
+                    $.menuItem.expandActionView();
 
+                }));
+            АктйонБар.setSubtitle('Suche nach „' + needle + '“ ergab ' + total + ' Treffer');
+            var items = [];
+            var sectionIndex = _res.page - 1;
+            _res.items.forEach(function(item) {
                 items.push({
                     properties : {
+                        searchableText : item.title + item.author + item.sendung,
                         itemId : JSON.stringify(item),
                         accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE
                     },
@@ -70,47 +88,52 @@ module.exports = function(needle) {
                         color : item.color
                     },
                     pubdate : {
-                        text : 'Sendedatum: ' + item.pubdate + ' Uhr'
+                        text : 'Sendedatum: ' + item.pubdate
                     },
                     duration : {
-                        text : 'Dauer: ' + item.duration
+                        text : 'Dauer: ' + item.durationHHmmss
                     },
                     author : {
                         text : 'Autor: ' + item.author
                     }
                 });
             });
-            $.list.sections[_res.section].setItems(items);
+            $.list.appendSection(Ti.UI.createListSection({
+                items : items
+            }));
+            //            $.list.sections[sectionIndex].setItems(items);
 
         } else
             $.close();
     };
-    Search({
-        where : 'mediathek',
-        needle : needle,
-        section : 0,
-        done : setDataintoSectionFn
-    });
+    Search(needle, 1, setDataintoSectionFn);
     var $ = Ti.UI.createWindow({
-        backgroundColor : '#bb000000',
-
+        backgroundImage : '/images/rainersinniert.jpg',
+        fullscreen : true,
+        theme : "Theme.AppCompat.Light.DarkActionBar",
+        searchView : Ti.UI.Android.createSearchView({
+            hintText : "Filter in der Liste",
+            submitEnabled : false
+        })
     });
-    
+
     $.list = Ti.UI.createListView({
         templates : {
             'search' : require('TEMPLATES').search,
         },
         defaultItemTemplate : 'search',
         backgroundColor : 'transparent',
-        sections : [Ti.UI.createListSection()]
+        searchView : $.searchView,
+        sections : []
+
     });
     $.add($.list);
+
     $.add(Gears);
-    
+
     $.list.addEventListener('itemclick', onitemclickFn);
     $.addEventListener('open', onOpenFn);
-    
-    console.log("gears added");
+
     return $;
 };
 

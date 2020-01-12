@@ -1,23 +1,25 @@
-const LDF = Ti.Platform.displayCaps.logicalDensityFactor;
-const SCREENWIDTH = Ti.Platform.displayCaps.platformWidth / LDF;
-const SCREENHEIGHT = Ti.Platform.displayCaps.platformHeight / LDF;
-const DIVISIONS = Math.round(25 / LDF);
 const Dayplan = new (require('controls/dayplan.adapter'))();
-const VisualizerModule = require('ti.audiovisualizerview');
-const PATH = '/images/stationlogos3/%s.png';
+const VisualizerView = require('ui/visualizer.widget');
+const H = 100;
 const Permissions = require('vendor/permissions');
 
-var $ = function(station) {
+var $ = function(window) {
+    this.window = window;
+    this.station = window.station;
+
     var that = this;
     this.view = Ti.UI.createView({
-        backgroundColor : '#aa000000'
+        backgroundColor : '#99000000',
+
     });
-    this.topContainer = Ti.UI.createScrollView({
-        layout : 'vertical',
-        bottom : 50,
-        scrollType : 'vertical'
+    this.starttime = 0;
+    this.topContainer = Ti.UI.createView({
+        top : 0,
+        height : H,
+        layout : 'vertical'
+
     });
-    this.view.add(this.topContainer);
+
     this.titleView = Ti.UI.createLabel({
         color : "white",
         font : {
@@ -32,7 +34,7 @@ var $ = function(station) {
     });
 
     this.progressView = require('liveradio/progress.widget')({
-        color : station.color,
+        color : this.station.color,
         start : 'Start',
         end : 'Ende'
     });
@@ -40,41 +42,51 @@ var $ = function(station) {
     this.topContainer.add(this.titleView);
     this.topContainer.add(this.progressView);
 
+    this.bottomContainer = Ti.UI.createScrollView({
+        scrollType : 'vertical',
+        layout : 'vertical',
+        top : H,
+        bottom : 40
+    });
+    this.bottomContainer.addEventListener("scrollstart",() => {
+        if (this.zappler)
+            this.zappler.opacity = 0;
+    });
+    this.bottomContainer.addEventListener("scrollend",() => {
+        if (this.zappler)
+            this.zappler.animate({
+                opacity : 1
+            });
+    });
+
+    this.view.add(this.topContainer);
+    this.view.add(this.bottomContainer);
     this.descriptionView = Ti.UI.createLabel({
         color : "white",
         font : {
-            fontSize : 22,
+            fontSize : 18,
             fontFamily : 'Aller Bold'
         },
         text : '',
         width : Ti.UI.FILL,
         left : 20,
-        top : 10,
+        top : 0,
         right : 20
     });
-    this.topContainer.add(this.descriptionView);
-    this.bottomContainer = Ti.UI.createView({
-        bottom : 40,
-        right : 0,
-        width : SCREENWIDTH / 2,
-        height : SCREENWIDTH / 2,
-        backgroundColor : station.color,
-    });
-
-    this.view.add(this.bottomContainer);
-
+    this.bottomContainer.add(this.descriptionView);
     this.radiotextView = Ti.UI.createView({
         height : 40,
         bottom : 0,
-        backgroundColor : station.color
+        backgroundColor : this.station.color
     });
+    this.view.add(this.radiotextView);
     this.radiotextView.add(Ti.UI.createLabel({
         color : "white",
         font : {
             fontSize : 22,
             fontFamily : 'Aller Bold'
         },
-        text : station.name,
+        text : this.station.name,
         width : Ti.UI.FILL,
         horizontalWrap : false,
         ellipsize : Ti.UI.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE,
@@ -82,7 +94,16 @@ var $ = function(station) {
         right : 20
     }));
     this.updateView = () => {
-        Dayplan.getCurrentOnAir(station.station, currentItem => {
+        Dayplan.getCurrentOnAir(this.station.station, currentItem => {
+            if (!currentItem.starttime)
+                return;
+            if (!this.starttime)
+                this.starttime = currentItem.starttime;
+            console.log(this.starttime + '  ' + currentItem.starttime);
+            if (currentItem.starttime && this.starttime && currentItem.starttime > this.starttime) {
+                console.log("Das Ende naht ...");
+                this.window.close();
+            }
             if (!currentItem.title)
                 return;
             if (this.progressView) {
@@ -115,17 +136,14 @@ var $ = function(station) {
                 }
                 this.coverView.image = currentItem.image
             }
-            if (currentItem.title)
+            if (currentItem.title) {
                 this.titleView.text = currentItem.title;
 
-            this.descriptionView.text = (currentItem.description) 
-            ? currentItem.description.replace(/<br\/>/gim, '\n')//
+            }
+            this.descriptionView.text = (currentItem.description) ? currentItem.description.replace(/<br\/>/gim, '\n')//
             .replace(/<\/p>/gim, '\n').replace(/<p>/gim, '').replace(/&amp;/gim, '&') : "";
-
         });
     }
-
-    this.view.add(this.radiotextView);
     //playerView.children[0].addEventListener('click', stopPlayer);
     return this;
 };
@@ -138,22 +156,10 @@ $.prototype.rerenderUI = function() {
 };
 
 $.prototype.addVisualization = function() {
-    var v = VisualizerModule.createView({
-        audioSessionId : 0,
-        touchEnabled : false,
-        transform : Ti.UI.createMatrix2D({
-            rotate : 90,
-            scale : 0.4,
-
-        }),
-        bargraphRenderer : {
-            barWidth : 0.8 * SCREENWIDTH / DIVISIONS / LDF,
-            color : 'white',
-            divisions : DIVISIONS
-        },
-    });
-    this.bottomContainer.add(v);
+    this.zappler = VisualizerView(this.window, this.station.color, 0);
+    this.zappler.bottom = 40, this.window.add(this.zappler);
 };
+
 $.prototype.setText = function(text) {
     this.radiotextView.children[0].text = text;
 };

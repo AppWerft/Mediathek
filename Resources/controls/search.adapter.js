@@ -1,100 +1,67 @@
 var Moment = require('vendor/moment'),
-    XMLTools = require('vendor/XMLTools');
-Model = require('model/stations');
-const DB = Ti.App.Properties.getString('DATABASE');
+    Soup = require("de.appwerft.soup"),
+    Stations = require('model/stations'),
+    DB = Ti.App.Properties.getString('DATABASE'),
+    URL = 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:searchterm=NEEDLE&drau:page=PAGE&drau:limit=1500';
 
-var toType = function(obj) {
-	return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+const loadSendungen = function(needle, page, onload) {
+    var url = URL.replace('NEEDLE', encodeURIComponent(needle)).replace('PAGE', page || '1');
+    console.log(url);
+    Soup.createDocument({
+        url : url,
+        timeout : 30000,
+        useragent : 'Das%20DRadio/6 CFNetwork/711.1.16 Darwin/14.0.0',
+        onerror : function() {
+            console.log("Error from Soup !!!!");
+        },
+        onload : function(result) {
+            var start = new Date().getTime();
+            if (!result.document) {
+                console.log("Error: result without document");
+                return;
+            }
+            var res = [];
+            console.log("length of XML answer: " + result.length);
+
+            var items = result.document.select("item");
+            items && items.forEach(function(item) {
+                const station = item.getFirstElementByTag("station").getText().toLowerCase();
+                const duration = 1000 * item.getAttribute("duration");
+                const pubdate = Moment(item.getFirstElementByTag("datetime").getText());
+                res.push({
+                    url : item.getAttribute("url"),
+                    timestamp : item.getAttribute("timestamp"),
+                    pubdate : pubdate.format('DD.MM.YYYY HH:mm') + ' Uhr',
+                    duration : duration,
+                    durationHHmmss : Moment(duration).utc().format("H:mm:ss"),
+                    deliveryMode : item.getAttribute("deliveryMode"),
+
+                    title : item.getFirstElementByTag("title").getText(),
+                    station : station,
+                    author : item.getFirstElementByTag("author").getText(),
+                    sendung : item.getFirstElementByTag("sendung").getText(),
+                    color : Stations[station].color,
+                    image : '/images/' + station + '.png',
+                });
+            });
+            console.log("parseTime=" + (new Date().getTime() - start));
+            onload({
+                count : res.length,
+                items : res,
+                duration : result.duration,
+                page : page
+            });
+            // after first page is rendered:
+            if (page == 1) { // Start page
+                const pages = result.document.selectFirst("entries").getAttribute("pages");
+                if (pages) { // only start from first page
+                    for (var p = 2; p <= pages; p++)
+                        loadSendungen(needle, p, onload);
+                }
+            }
+        }
+    });
+
 };
 
-const URL = 'http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:searchterm=NEEDLE&drau:page=1&drau:limit=300';
-
-var stations = {
-	4 : 'dlf',
-	3 : 'drk',
-	1 : 'drw'
-};
-
-module.exports = function() {
-	var args = arguments[0] || {};
-	if (args.where == 'mediathek') {
-		var xhr = Ti.Network.createHTTPClient({
-			timeout : 30000,
-			onload : function() {
-			    var start = new Date().getTime();
-				var payload = new XMLTools(this.responseXML).toObject();
-				console.log("parseTime: " + (new Date().getTime()-start));
-				var items = payload.item;
-				if (items && toType(items) != 'array') {
-					items = [items];
-				}
-				if (items == undefined) {
-					args.done({
-						items : [],
-						section : args.section
-					});
-					return;
-				}
-				args.done({
-					items : items.map(function(item) {
-					 	return {
-							pubdate : Moment(item.datetime).format('DD.MM.YYYY HH:mm'),
-							title : item.title,
-							author : item.author,
-							sendung : item.sendung.text,
-							sendung_id : item.sendung.id,
-							url : item.url,
-							image : '/images/' + stations[item.station] + '.png',
-							station : stations[item.station],
-							duration : 1000*item.duration,
-							color : Model[stations[item.station]].color
-						};
-					}),
-					section : args.section
-				});
-			}
-		});
-		xhr.open('GET', URL.replace('NEEDLE', encodeURIComponent(args.needle)));
-		xhr.send();
-	} else {
-		var link = Ti.Database.open(DB);
-		var res = link.execute('SELECT *,'//
-		+ '(SELECT title FROM feeds WHERE feeds.url=items.channelurl) AS podcast,'//
-		+ '(SELECT image FROM feeds WHERE feeds.url=items.channelurl) AS channelimage,'//
-		+ '(SELECT station FROM feeds WHERE feeds.url=items.channelurl) AS station '//
-		+ ' FROM items WHERE title LIKE "%' + args.needle + '%" OR description LIKE "%' + args.needle + '%" ORDER BY pubdate DESC LIMIT 500');
-		var items = [];
-		while (res.isValidRow()) {
-			var parts = res.getFieldByName('duration').split(':');
-			var item = {
-				title : res.getFieldByName('title'),
-				pubdate : Moment(res.getFieldByName('pubdate')).format('DD. MM. YYYY  HH:ii'),
-				author : res.getFieldByName('author'),
-				sendung : res.getFieldByName('podcast'),
-				url : res.getFieldByName('enclosure_url'),
-				description : res.getFieldByName('description'),
-				podcast : res.getFieldByName('podcast'),
-				author : res.getFieldByName('author'),
-				duration : parseInt(parts[0] * 60) + parseInt(parts[1]),
-				station : res.getFieldByName('station'),
-				color : Model[res.getFieldByName('station')].color,
-				image : res.getFieldByName('channelimage')
-			};
-			var match = /<img src="(.*?)"\s.*?title="(.*?)".*?\/>(.*?)</gmi.exec(item.description);
-			if (match) {
-				item.image = match[1];
-				item.desription =match[3];
-				item.copyright = match[2];
-			} else
-				description = undefined;
-			items.push(item);
-			res.next();
-		}
-		res.close();
-		link.close();
-		args.done({
-			items : items,
-			section : args.section
-		});
-	}
-};
+module.exports = loadSendungen;

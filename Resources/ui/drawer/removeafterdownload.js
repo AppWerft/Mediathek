@@ -8,7 +8,7 @@ module.exports = function() {
     $.add(Ti.UI.createLabel({
         color : 'white',
         left : 10,
-        right : 50,
+        right : 90,
         text : "Lokale Kopie sofort nach Abspielen löschen"
     }));
      $.add(Ti.UI.createSwitch({

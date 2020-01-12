@@ -1,15 +1,21 @@
 const Permissions = require('vendor/permissions');
+const Settings = require("controls/settings");
 const STATUS_ONLINE = 0,
     STATUS_PROGRESS = 1,
     STATUS_SAVED = 2;
+const SCREENWIDTH = Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor;
+
 const TEMPLATES = ['pool_online'];
 const ABX = require('com.alcoapps.actionbarextras');
+const LivePlayer = require('liveradio/radioplayer.widget');
+const LottieView = require("ti.animation");
 
 module.exports = function(station) {
     const Streamer = require('liveradio/audiostreamer.adapter');
     // // START /////
     var $ = Ti.UI.createWindow({
         modal : true,
+        station: station,
         backgroundColor : 'transparent',
         theme : 'Theme.AppCompat.Translucent.NoTitleBar.Fullscreen'
     });
@@ -66,32 +72,27 @@ module.exports = function(station) {
         $.removeAllChildren();
         $ = null;
     });
+    $.addEventListener('swipe', _e => {
+        if (_e.direction == "left" || _e.direction == "right") {
+            $.close();
+        }
+    });
     $.addEventListener('open', _e => {
-        // require('ti.immersivemode').hideSystemUI();
-        const activity = $.activity;
-        if (activity != undefined && activity.actionBar != undefined) {
-            activity.onCreateOptionsMenu = _menu => {
-                activity.actionBar.displayHomeAsUp = true;
-                _menu.menu.add({
-                title : 'Record',
-                icon : Ti.App.Android.R.drawable.ic_action_record,
-                showAsAction : Ti.Android.SHOW_AS_ACTION_IF_ROOM,
-                }).addEventListener("click", () => {
-                    alert("Hier startet bald die Möglichkeit " + station.name + " live mitzuschneiden");
-                });
-                activity.invalidateOptionsMenu();
-                activity.actionBar.onHomeIconItemSelected = () => {
-                    $.close({
-                        activityEnterAnimation : Ti.Android.R.slide_in_left,
-                        activityExitAnimation : Ti.Android.R.slide_out_right
-                    });
-                };
-            };
-        } else
-            console.log("win has no activity");
-        PlayerView = require('liveradio/radioplayer.widget').createView(station);
-        $.cron = setInterval(PlayerView.updateView, 2000);
+        if (Settings.get("SCHLUMMER")) {
 
+            $.add(LottieView.createAnimationView({
+                file : '/images/snooze_' + station.station + '.json',
+                autoStart : true,
+                loop : true,
+                height : 300,
+                width : 300,
+                zIndex : 99
+            }));
+            $.schlummer = true;
+
+        }
+        PlayerView = LivePlayer.createView($);
+        $.cron = setInterval(PlayerView.updateView, 2000);
         PlayerView && $.add(PlayerView.getView());
         Permissions.requestPermissions(['READ_PHONE_STATE', 'RECORD_AUDIO'], onPermission);
         PlayerView && PlayerView.updateView()
