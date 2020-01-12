@@ -87,6 +87,31 @@ exports.schema = {
 		}]
 	}]
 };
+
+exports.archive = {
+    properties : {
+        height : 60,
+        backgroundColor : 'white',
+        itemId : ''
+    },
+    childTemplates : [{
+            type : 'Ti.UI.Label',
+            bindId : 'title',
+            
+            properties : {
+                
+                font : {
+                    fontSize : 20,
+                    fontFamily : 'Aller Bold'
+                },
+                left : 10,
+                right:50,
+                width : Ti.UI.FILL,
+                color : 'white',
+            }
+    }]
+};
+
 exports.podcastlist = {
 	properties : {
 		height : Ti.UI.SIZE,

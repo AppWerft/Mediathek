@@ -109,7 +109,7 @@ module.exports = function(needle) {
     Search(needle, 1, setDataintoSectionFn);
     var $ = Ti.UI.createWindow({
         backgroundImage : '/images/rainersinniert.jpg',
-        fullscreen : true,
+        
         theme : "Theme.AppCompat.Light.DarkActionBar",
         searchView : Ti.UI.Android.createSearchView({
             hintText : "Filter in der Liste",

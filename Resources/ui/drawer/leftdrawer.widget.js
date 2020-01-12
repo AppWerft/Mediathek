@@ -36,33 +36,28 @@ module.exports = function(parent) {
     });
     $.searchRow.add(Ti.UI.Android.createSearchView({
         color : '#fff',
-        hintText : "Suchebegriff"
+        right : 50,
+        hintText : "Suchbegriff"
     }));
-    
-    var yearPicker = Ti.UI.createPicker({
-        right : 5,
-        width:100,
-        selectionIndicator : true,
-        borderColor : 'yellow',
-        borderWidth : 1
+    var burgerIcon = Ti.UI.createLabel({
+        right : 20,
+        textAlign : 'right',
+        width : 50,
+        height : Ti.UI.FILL,
+        text : '☰',
+        font : {
+            fontSize : 20,
+            fontWeight : 'bold'
+        }
     });
-    
-    $.searchRow.add(yearPicker);
+    burgerIcon.addEventListener('click', () => {
+        Ti.UI.createNavigationWindow({
+            window : require('ui/archive/index.window')(),
+            theme : "Theme.AppCompat.Light.DarkActionBar",
+        }).open();
 
-    /*var data = ['alle'];
-
-    for (var y = Moment().year(); y > 2000; y--) {
-        data.push(Ti.UI.createPickerRow({
-            title : '' + y
-        }));
-    }*/
-   var data = [];
-data[0]=Ti.UI.createPickerRow({title:'Bananas'});
-data[1]=Ti.UI.createPickerRow({title:'Strawberries'});
-data[2]=Ti.UI.createPickerRow({title:'Mangos'});
-data[3]=Ti.UI.createPickerRow({title:'Grapes'});
-
-    yearPicker.add(data);
+    });
+    $.searchRow.add(burgerIcon);
 
     $.add($.searchRow);
 
@@ -73,7 +68,7 @@ data[3]=Ti.UI.createPickerRow({title:'Grapes'});
     });
 
     $.add(Ti.UI.createLabel({
-        top : 5,
+        top : 10,
         left : 10,
         textAlign : 'left',
         width : Ti.UI.FILL,
@@ -139,6 +134,5 @@ data[3]=Ti.UI.createPickerRow({title:'Grapes'});
             fontFamily : 'Aller'
         }
     }));
-
     return $;
 };

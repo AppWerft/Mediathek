@@ -165,7 +165,7 @@ $.prototype = {
             const startHLSFn = () => {
                 Ti.UI.createNotification({
                     message : "Architektur:\n"+FFmpeg.getABI(),
-                    duration : 5000
+                    duration : 500
                 }).show();
                 const client = FFmpeg.createHLSClient();
                 // during download this will called every second:

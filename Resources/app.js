@@ -23,7 +23,7 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
         };
         $.Drawer = Ti.UI.Android.createDrawerLayout({
             leftView : require('ui/drawer/leftdrawer.widget')($),
-            rightView : require('ui/drawer/rightdrawer.widget')(),
+            //rightView : require('ui/drawer/rightdrawer.widget')(),
             
             centerView : FlipModule.createFlipView({
                 orientation : FlipModule.ORIENTATION_HORIZONTAL,
