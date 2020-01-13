@@ -88,6 +88,7 @@ $.prototype = {
                 onload: function() {
                     const res= JSON.parse(this.responseData);
                     onload({
+                        starttime : res.show.starttime,
                         image : res.playlistItem.cover,
                         title : res.show.title,
                         author : res.presenter.displayname,
@@ -100,9 +101,7 @@ $.prototype = {
 
         }
 
-        onload({
-            title : ''
-        });
+       
 
     },
     _getRSS : function(stationName, done) {

@@ -30,7 +30,7 @@ module.exports = function(navwindow,broadcast) {
             };
 
             activity.actionBar.onHomeIconItemSelected = function() {
-                $.close();
+                $.navigationWindow.closeWindow($);
             };
             activity.invalidateOptionsMenu();
         } else
@@ -104,8 +104,17 @@ module.exports = function(navwindow,broadcast) {
             }));
             //            $.list.sections[sectionIndex].setItems(items);
 
-        } else
-            $.close();
+        } else {
+            var dialog = Ti.UI.createAlertDialog({
+                message: "Im Bereich " + title + " werden zur Zeit keine Beiträge bereitgestellt",
+                ok: 'Ok',
+                title: title
+            });
+            dialog.show();
+            dialog.addEventListener("click",function(){
+                 $.navigationWindow.closeWindow($);
+            });
+        }    
     };
     Filter(id, 1, setDataintoSectionFn);
     var $ = Ti.UI.createWindow({

@@ -15,7 +15,7 @@ module.exports = function(station) {
     // // START /////
     var $ = Ti.UI.createWindow({
         modal : true,
-        station: station,
+        station : station,
         backgroundColor : 'transparent',
         theme : 'Theme.AppCompat.Translucent.NoTitleBar.Fullscreen'
     });
@@ -57,7 +57,7 @@ module.exports = function(station) {
         currentStation = station;
     }
 
-    function onPermission(success) {
+    function onPermissionGranted(success) {
         if (success) {
             PlayerView && PlayerView.addVisualization();
             playStation(station);
@@ -79,7 +79,6 @@ module.exports = function(station) {
     });
     $.addEventListener('open', _e => {
         if (Settings.get("SCHLUMMER")) {
-
             $.add(LottieView.createAnimationView({
                 file : '/images/snooze_' + station.station + '.json',
                 autoStart : true,
@@ -89,13 +88,16 @@ module.exports = function(station) {
                 zIndex : 99
             }));
             $.schlummer = true;
-
         }
+        console.log("RadioPlayer opened");
         PlayerView = LivePlayer.createView($);
-        $.cron = setInterval(PlayerView.updateView, 2000);
-        PlayerView && $.add(PlayerView.getView());
-        Permissions.requestPermissions(['READ_PHONE_STATE', 'RECORD_AUDIO'], onPermission);
-        PlayerView && PlayerView.updateView()
+        if (PlayerView) {
+            $.add(PlayerView.getView());
+            $.cron = setInterval(PlayerView.updateView, 2000);
+            Permissions.requestPermissions(['READ_PHONE_STATE', 'RECORD_AUDIO'], onPermissionGranted);
+            PlayerView.updateView()
+        } else
+            console.log("no PlayerView!!!");
     });
     return $;
 };

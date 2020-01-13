@@ -80,7 +80,6 @@ var $ = function(options) {
         that.Storage.setProgress(_e.progress);
         if (options.duration) {
             const progress = _e.progress / options.duration;
-            console.log("progress=" + progress);
             that.Notification.setProgress(progress);
         }
     };

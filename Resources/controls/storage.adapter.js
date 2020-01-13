@@ -163,10 +163,11 @@ $.prototype = {
             LOG("START HLS DOWNLOADING");
             this.fireEvent("ACTION_BUFFERINGSTARTED", {});
             const startHLSFn = () => {
-                Ti.UI.createNotification({
+                /*Ti.UI.createNotification({
                     message : "Architektur:\n"+FFmpeg.getABI(),
                     duration : 500
                 }).show();
+                */
                 const client = FFmpeg.createHLSClient();
                 // during download this will called every second:
                 client.setInput(this.url).setAudiocodec(FFmpeg.CODEC_MP3).setFile(this.localfile).setOverwrite(true);
@@ -183,7 +184,7 @@ $.prototype = {
                     this.fireEvent("ACTION_READYTOSEEK", {});
                 }
             }
-            if (false && FFmpegLoader.isLoaded()) {
+            if (FFmpegLoader.isLoaded()) {
                 console.log("FFmpeg direct loaded, can start");
                 startHLSFn();
             } else {

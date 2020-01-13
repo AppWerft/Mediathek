@@ -1,6 +1,7 @@
 const Dayplan = new (require('controls/dayplan.adapter'))();
 const VisualizerView = require('ui/visualizer.widget');
 const H = 100;
+const SCREENWIDTH = Ti.Platform.displayCaps.platformWidth / Ti.Platform.displayCaps.logicalDensityFactor;
 const Permissions = require('vendor/permissions');
 
 var $ = function(window) {
@@ -40,7 +41,8 @@ var $ = function(window) {
     });
 
     this.topContainer.add(this.titleView);
-    this.topContainer.add(this.progressView);
+    if (this.station.station != 'drw')
+       this.topContainer.add(this.progressView);
 
     this.bottomContainer = Ti.UI.createScrollView({
         scrollType : 'vertical',
@@ -94,7 +96,9 @@ var $ = function(window) {
         right : 20
     }));
     this.updateView = () => {
+        console.log("updateView");
         Dayplan.getCurrentOnAir(this.station.station, currentItem => {
+            console.log(currentItem);
             if (!currentItem.starttime)
                 return;
             if (!this.starttime)
@@ -121,7 +125,7 @@ var $ = function(window) {
                     });
                     this.view.add(this.coverView);
                 }
-                this.coverView.image = currentItem.image
+               if (this.coverView) this.coverView.image = currentItem.image
             }
             if (currentItem.avatar) {
                 if (!this.avatarView) {
@@ -134,7 +138,6 @@ var $ = function(window) {
                     });
                     this.view.add(this.avatarView);
                 }
-                this.coverView.image = currentItem.image
             }
             if (currentItem.title) {
                 this.titleView.text = currentItem.title;
