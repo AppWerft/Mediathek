@@ -96,14 +96,13 @@ var $ = function(window) {
         right : 20
     }));
     this.updateView = () => {
-        console.log("updateView");
-        Dayplan.getCurrentOnAir(this.station.station, currentItem => {
-            console.log(currentItem);
+        console.log("Start cronjob „updateRadioView“");
+        Dayplan.getCurrentOnAir(this.station.station, currentItem => {           
             if (!currentItem.starttime)
                 return;
             if (!this.starttime)
                 this.starttime = currentItem.starttime;
-            console.log(this.starttime + '  ' + currentItem.starttime);
+                
             if (currentItem.starttime && this.starttime && currentItem.starttime > this.starttime) {
                 console.log("Das Ende naht ...");
                 this.window.close();
@@ -143,8 +142,8 @@ var $ = function(window) {
                 this.titleView.text = currentItem.title;
 
             }
-            this.descriptionView.text = (currentItem.description) ? currentItem.description.replace(/<br\/>/gim, '\n')//
-            .replace(/<\/p>/gim, '\n').replace(/<p>/gim, '').replace(/&amp;/gim, '&') : "";
+           this.descriptionView.text = (currentItem.description) ? currentItem.description.replace(/<br\/>/gim, '\n')//
+           .replace(/<\/p>/gim, '\n').replace(/<p>/gim, '').replace(/&amp;/gim, '&') : "";
         });
     }
     //playerView.children[0].addEventListener('click', stopPlayer);

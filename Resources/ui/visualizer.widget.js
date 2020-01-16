@@ -16,6 +16,6 @@ module.exports = function(lifecycleContainer, color, audioSessionId) {
         } : undefined,
         touchEnabled : false,
         bottom : Settings.get("VISUBAR") ? 0 : undefined,
-        lifecycleContainer : lifecycleContainer,
+       // lifecycleContainer : lifecycleContainer,
     });
 };

@@ -4,8 +4,9 @@ Model = require('model/stations'),
 FFmpeg = require("ti.ffmpeg"),
 FFmpegLoader = require("controls/ffmpeg.loader"),
 FOLDER = 'RadioCache',
-FORCED = false;
-BUFFER_TIME = 2000;
+FORCED = false,
+COMPLETE = 8,
+BUFFER_TIME = 10000;
 //5 sec.
 
 var start = new Date().getTime();
@@ -71,7 +72,6 @@ function getLocalFile(station, url) {
         folder.createDirectory();
     }
     var localfile = null;
-    //https://dradiohls-vh.akamaihd.net/i/2020/01/03/eine_musik_worueber_die_welt_erstaunen_soll_von_der_drk_20200103_2230_e87b80e8.mp4/master.m3u8
     const regex = {
         mp3 : /\/([0-9_a-zA-Z]+)\.mp3$/,
         mp4 : /\/([0-9_a-zA-Z]+)\.mp4\/master\.m3u8$/
@@ -137,7 +137,7 @@ $.prototype = {
         LOG("////////////////START DOWNLAD\\\\\\\\\\\\\\\\\\");
 
         const link = Ti.Database.open(DB);
-        const cursor = link.execute("SELECT * FROM recents WHERE url=?", this.url);
+        const cursor = link.execute("SELECT * FROM recents WHERE url=? AND status=?", this.url,COMPLETE);
         if (!FORCED && this.localfile.exists() && !!cursor && cursor.isValidRow() && cursor.rowCount > 0) {//allways in DB
             const status = cursor.getFieldByName("status");
             const res = {
@@ -179,7 +179,7 @@ $.prototype = {
                     if (!this.status.started)
                         this.fireEvent("ACTION_READYTOPLAY", this.getState());
                     this.status.started = true;
-                    link && link.execute("UPDATE recents SET status=? WHERE url=?", 8, this.url);
+                    link && link.execute("UPDATE recents SET status=? WHERE url=?", COMPLETE, this.url);
                     link && link.close();
                     this.fireEvent("ACTION_READYTOSEEK", {});
                 }

@@ -1,5 +1,6 @@
 const Permissions = require('vendor/permissions');
 const Settings = require("controls/settings");
+const Aod = require("ti.aod");
 const STATUS_ONLINE = 0,
     STATUS_PROGRESS = 1,
     STATUS_SAVED = 2;
@@ -9,15 +10,39 @@ const TEMPLATES = ['pool_online'];
 const ABX = require('com.alcoapps.actionbarextras');
 const LivePlayer = require('liveradio/radioplayer.widget');
 const LottieView = require("ti.animation");
+const Streamer = require('liveradio/audiostreamer.adapter');
 
 module.exports = function(station) {
-    const Streamer = require('liveradio/audiostreamer.adapter');
+    var onAir;
+    console.log("////////////////////Aod.createPreviewdata ");
+    console.log(station);
+    if (station.id) {
+        onAir = Aod.createPreviewdata({
+            station : station.id
+        });
+        onAir.start({
+            interval : 2000,
+            onload : function(broadcast) {
+                console.log(broadcast);
+            }
+        });
+    }
     // // START /////
     var $ = Ti.UI.createWindow({
-        modal : true,
+        //modal : true,
         station : station,
-        backgroundColor : 'transparent',
+        backgroundColor : '#8000',
         theme : 'Theme.AppCompat.Translucent.NoTitleBar.Fullscreen'
+    });
+
+    $.addEventListener('blur', function() {
+        $.active = false;
+        console.log("RadioPlayer goes into PAUSE");
+    });
+    $.addEventListener('focus', function() {
+        $.active = true;
+        console.log("RadioPlayer goes into RESUME");
+
     });
     Streamer.init($, "applogo");
     var lastStatus = "STOPPED";
@@ -93,7 +118,10 @@ module.exports = function(station) {
         PlayerView = LivePlayer.createView($);
         if (PlayerView) {
             $.add(PlayerView.getView());
-            $.cron = setInterval(PlayerView.updateView, 2000);
+            /*$.cron = setInterval(function() {
+             if ($.active)
+             PlayerView.updateView();
+             }, 5000);*/
             Permissions.requestPermissions(['READ_PHONE_STATE', 'RECORD_AUDIO'], onPermissionGranted);
             PlayerView.updateView()
         } else

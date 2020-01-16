@@ -1,6 +1,10 @@
 const Global = require('global');
-const FlipModule = require('de.manumaticx.androidflip'); ! function() {
+const FlipModule = require('de.manumaticx.androidflip'); 
+const Aod = require('ti.aod');
 
+
+! function() {
+    Aod.init();
     const $ = Ti.UI.createWindow({
        // fullscreen : true,
         navBarHidden: false,
@@ -63,4 +67,5 @@ const FlipModule = require('de.manumaticx.androidflip'); ! function() {
     $.createAndStartPlayer = function(_args) {
         require('ui/audioplayer.window').createAndStartPlayer(_args);
     };
+    
 }();

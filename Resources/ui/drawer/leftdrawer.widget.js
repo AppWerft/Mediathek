@@ -44,9 +44,10 @@ module.exports = function(parent) {
         textAlign : 'right',
         width : 50,
         height : Ti.UI.FILL,
+        color: 'white',
         text : '☰',
         font : {
-            fontSize : 20,
+            fontSize : 22,
             fontWeight : 'bold'
         }
     });

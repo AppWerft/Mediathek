@@ -21,14 +21,7 @@ module.exports = function(_args) {
     Ti.App.addEventListener('daychanged', function() {
         $.date = Moment().startOf('day');
     });
-    /*setTimeout(function() {
-     $.calendarView = require('ui/calendar.widget')({
-     $ : $,
-     color : _args.color
-     });
-     $.add($.calendarView);
-     }, 2000);*/
-
+    
     $.mainList = Ti.UI.createListView({
         backgroundColor : _args.color,
         templates : {
@@ -119,10 +112,7 @@ module.exports = function(_args) {
         });
     };
 
-    if ($.date.isSame(Moment().startOf('day')))
-        $.cron = setInterval($.updateMediathekList, 300000);
-    else
-        clearInterval($.cron);
+   
     var locked = false;
     var onitemclickFunc = function(_e) {
         var start = new Date().getTime();

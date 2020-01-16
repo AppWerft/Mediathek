@@ -261,7 +261,6 @@ var $ = function(options) {
             }
         });
         this._window.addEventListener('open', function() {
-            console.log(options)
             that.Notification = AudioNotification.createNotification({
                 icon : 'smallicon',
                 lifecycleContainer : that._window,

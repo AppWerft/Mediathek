@@ -32,9 +32,18 @@ $.prototype = {
     },
     _updateTimestamps : function(stationName) {
         var url = Stations[stationName].dayplan + '?YYYYMMDD=' + Moment().format('YYYYMMDD');
+        console.log(url);
         if (Ti.App.Properties.hasProperty("DAYPLAN#" + stationName)) {
-            var items = JSON.parse(Ti.App.Properties.getString("DAYPLAN#" + stationName));
+            console.log("hasProperty DAYPLAN#" + stationName );
+            var items;
+            try {
+                items = JSON.parse(Ti.App.Properties.getString("DAYPLAN#" + stationName));
+            } catch(e) {
+                console.log(e);
+                return [];
+            }
             var length = items.length;
+            console.log("Items="+length);
             var ndx = 0;
             for ( i = 0; i < length; i++) {
                 var item = items[i];
@@ -64,11 +73,13 @@ $.prototype = {
                 if (!item.enddate.isAfter(Moment()))
                     ndx++;
             }
+            console.log("Recalculation finished");
             return items;
         } else
             return [];
     },
     getCurrentOnAir : function(stationName, onload) {
+        console.log("getCurrentOnAir");
         var that = this;
         if (stationName != 'drw') {
             this._getRSS(stationName, function() {
@@ -79,10 +90,7 @@ $.prototype = {
                         currentonair = item;
                 });
                 onload(currentonair);
-
             });
-            // test if new one (daychange)
-
         } else {
             const xhr = Ti.Network.createHTTPClient({
                 onload: function() {
@@ -105,6 +113,7 @@ $.prototype = {
 
     },
     _getRSS : function(stationName, done) {
+        console.log("_getRSS " + stationName);
         var that = this;
         var KEY = "DAYPLAN#" + stationName;
         if (Ti.App.Properties.hasProperty(KEY)) {
@@ -112,14 +121,15 @@ $.prototype = {
             if (!Array.isArray(items) || !items[0].guid || !items[0].guid.text) {
                 console.log('Warning: we kill old DAYPLAN');
                 Ti.App.Properties.removeProperty(KEY);
-                 console.log("test of invalide rss format: was invalide => remove");
+                console.log("test of invalide rss format: was invalide => remove");
                 return;
             }
             const guid = items[0].guid.text;
-            if  (guid.indexOf(Moment().format('YYYY-MM-DD')) <0)  {
+            if  (guid.indexOf(Moment().format('YYYY-MM-DD')) < 0)  {
                 Ti.App.Properties.removeProperty(KEY);
             }
         }
+        console.log("using valide dailyscheduler");
         if (Ti.App.Properties.hasProperty(KEY)) {
             done && done({
                 ok : true,

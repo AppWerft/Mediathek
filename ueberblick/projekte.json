@@ -1,0 +1,328 @@
+{
+	"title": "Mobile Projekte Dipl.-Ing. Rainer Schleevoigt",
+	"items": [
+		{
+			"projekt": "Vladi Private Islands",
+			"technik": "cordova/phonegap",
+			"plattformen": ["iOS, Android"],
+			"inhalt": ["Darstellung aktueller Immobilien", "redaktionelle Seiten", "Karte"],
+			"rolle": "Konzeption und Umsetzung",
+			"layoutdesign": "Eigenentwicklung",
+			"herausforderungen": [
+				{
+					"c": "Ablehnung durch Apple nach Revision wegen Inhaltskargheit",
+					"s": "Hinzufügung weiterer mobilspezifischer Funktionen"
+				}, {
+					"c": "nicht optimal geeignetes Backend",
+					"s": "Sanitizing der Daten, Cache"
+				}
+			],
+			"auftraggeber": "Vladi Private Islands"
+		}, {
+			"projekt": "Scoupy",
+			"technik": "cordova/phonegap",
+			"plattformen": ["iOS, Android"],
+			"rolle": "Konzeption und Umsetzung",
+			"layoutdesign": "Eigenentwicklung",
+			"inhalt": ["Couponsystem", "geobasierte Liste der Mandanten", "Einlösung der Coupons"],
+			"herausforderungen": [
+				{
+					"c": "Performanzprobleme bei langen Listen",
+					"s": "Umgestaltung der Listennavigation"
+				}
+			],
+			"auftraggeber": "Scoupy Nederland"
+		}, {
+			"projekt": "Begehbares Hörbuch",
+			"technik": "cordova/phonegap",
+			"plattformen": ["iOS, Android"],
+			"rolle": "Konzeption und Umsetzung",
+			"layoutdesign": "Kundenvorgabe",
+			"inhalt": ["Geobasiertes Abspielen von Audioinhalten"],
+			"herausforderungen": [
+				{
+					"c": "nichtmenschengetriggertes Abspielen von Assets in Webview",
+					"s": "Dirty hack"
+				}
+			],
+			"auftraggeber": "Ausgründung der FU Berlin (NDA)"
+		}, {
+			"projekt": "Promotion Elbphilharmonie",
+			"technik": "native Android App",
+			"plattformen": ["Android"],
+			"rolle": "Konzeption und Umsetzung",
+			"layoutdesign": "Kundenvorgabe",
+			"inhalt": ["VR-App zeigt Elbphilharmonie in Cardbox (3D, Stereo, kopfneigungsabhängig)"],
+			"herausforderungen": [
+				{
+					"c": "Abspielen eines 360°-Panorama-Videos > 1 GB",
+					"s": "Download aus Cloud"
+				}
+			],
+			"auftraggeber": "Werbefirma aus Winterhude (NDA)"
+		}, {
+			"projekt": "DLFmediathek",
+			"plattformen": ["Android"],
+			"inhalt": ["Mediathek der DLF-Inhalte", "Live-Radio mit Schlummerfunktion", "Audio-Archiv", "Suche"],
+			"technik": "Titanium",
+			"layoutdesign": "Eigenentwicklung",
+			"rolle": "Konzeption, Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "Live-Player mit Radiotext (ICY)",
+					"s": "Programmierung eines nativen Plugins mit C++-Bestandteilen, das aus dem MP3-Stream die Metainformationen extrahiert"
+				}, {
+					"c": "Android Oreo killt HintergrundApps",
+					"s": "Programmierung eines Vordergrunddienstes mit Notification"
+				}, {
+					"c": "DLF liefert zumehmend HLS-Streams über Akamei aus",
+					"s": "Programmierung eines nativen Plugins für die Nutzung eines ffmpeg-Binaries"
+				}, {
+					"c": "VisualisationView (Zeitverlauf- und FFT)",
+					"s": "Programmierung eines nativen Plugins basierend auf Pheeliks"
+				}, {
+					"c": "fehlende oder nichtöffentliche APIs",
+					"s": "Programmierung eines nativen Plugins zur Nutzung von JSoup. Damit lässt sich komfortable HTML parsen"
+				}
+			],
+			"auftraggeber": "OpenSource in Absprache mit DLF Köln"
+		}, {
+			"projekt": "Professional training for Hospitals",
+			"plattformen": ["Android", "iPad"],
+			"inhalt": ["Umbau einer phonegap-App nach Titanium", "Silent PushNotification zur Updateverwaltung, Offlinefunktion", "White labeling"],
+			"technik": "phonegap, Titanium",
+			"layoutdesign": "Kundenvorgabe",
+			"rolle": "Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "vorhandenen Code verstehen"
+				}, {
+					"c": "Zeitzone"
+				}
+			],
+			"auftraggeber": "Agentur in Sydney"
+		}, {
+			"projekt": "Hördat",
+			"plattformen": ["Android"],
+			"inhalt": ["Hörspielkalender mit Erinnerungsfunktion", "Verwaltungstool für Hörspiele  aus DACH, Offlinefunktion", "konfigurierbares Live-Radio", "Bund Freier Radios"],
+			"technik": "Titanium",
+			"layoutdesign": "Eigenentwicklung",
+			"rolle": "Konzeption, Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "Android Oreo killt HintergrundApps",
+					"s": "Programmierung eines Vordergrunddienstes mit Notification"
+				}, {
+					"c": "VisualisationView (Zeitverlauf- und FFT)",
+					"s": "Programmierung eines nativen Plugins basierend auf Pheeliks"
+				}, {
+					"c": "fehlende oder nichtöffentliche REST-APIs",
+					"s": "Programmierung eines nativen Plugins zur Nutzung von JSoup. Damit lässt sich komfortable HTML parsen"
+				}
+			],
+			"auftraggeber": "OS"
+		}, {
+			"projekt": "Homebanking für „Australia and New Zealand Banking Group“",
+			"technik": "cordova/phonegap",
+			"plattformen": ["iOS, Android"],
+			"rolle": "Beratung",
+			"herausforderungen": [
+				{
+					"c": "Performanz und Layoutprobleme",
+					"s": "Outsourcing"
+				}
+			],
+			"auftraggeber": "SAP"
+		}, {
+			"projekt": "PorscheIntra",
+			"inhalt": "mobile Version eines auf Jive basierenden Intranets",
+			"technik": "cordova, JSP",
+			"layoutdesign": "Eigenentwicklung nach Vorgaben",
+			"rolle": "Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "Performanz",
+					"s": "Lazy loading der Inhalte"
+				}, {
+					"c": "standardabweichende Layoutvorgaben",
+					"s": "Patch des Frameworks"
+				}, {
+					"c": "Infrastrukturprobleme, Bürokratie",
+					"s": "Geduld"
+				}
+			],
+			"plattformen": ["iOS, Android"],
+			"auftraggeber": "Porsche AG"
+		}, {
+			"projekt": "Audiotools",
+			"inhalt": "native Plugins zur Abfrage der Headsettasten und zur Anzeige des aktuellen Stückes als Widget auf dem Sperrbildschirms",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in Schweden (NDA)"
+		},{
+			"projekt": "Tierstimmenarchiv",
+			"inhalt": ["Katalog aller 25000 Tierstimmen","Bebilderung aus Wikibeständen","Sonogramm aller Stimmen","Stimme als Klingelton"],
+			"technik": "Titanium",
+			"rolle": "Konzeptiom, Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "Übertragung der Tierstimme als Klingelton"
+				}, {
+					"c": "natives Plugin"
+				}
+			],
+			"plattformen": ["Android"],
+			"auftraggeber": "OpenSource in Zusammenarbeit mit dem Museum für Naturkunde Berlin"
+		},  {
+			"projekt": "WiFi-Manager",
+			"inhalt": "native Plugins zur Kommunikation mit einer Kamera über WiFi",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in Montréal (NDA)"
+		}, {
+			"projekt": "Leica Distance",
+			"inhalt": "native Plugin zur Kommunikation mit Leica Laser-Distanzmesser (Bluetooth)",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "unzureichend dokumentierte Closedsource-Bibliothek (jar)",
+					"s": "Reverse engineering"
+				}
+			],
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in Manchester (NDA)"
+		}, {
+			"projekt": "TicketMaster",
+			"inhalt": "native Plugin für die Nutzung von Ticketmaster in einer EventApp",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "nichtdokumentierte Closedsource-Bibliothek (jar)",
+					"s": "Reverse engineering"
+				}
+			],
+			"plattformen": ["Android"],
+			"auftraggeber": "FANHERO in Austin, Texas"
+		}, {
+			"projekt": "Flic",
+			"inhalt": "native Plugin für die Kommunikation mit bluetoothbasierenden Knöpfen",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in den Niederlanden (NDA)"
+		}, {
+			"projekt": "Philips lifeline",
+			"inhalt": "native Plugin für die Realisierung eines XMPP-ChatClients",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in USA (NDA)"
+		}, {
+			"projekt": "Gerätebrowser miele@home",
+			"inhalt": "native Plugin für das Suchen nach IoT-Geräten (Bonjour)",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"plattformen": ["Android", "iOS"],
+			"auftraggeber": "Großer deutsche Weißwarenhersteller (NDA)"
+		}, {
+			"projekt": "",
+			"inhalt": "native Plugin für die Nutzung von Ticketmaster in einer EventApp",
+			"technik": "Titanium",
+			"rolle": "Umsetzung",
+			"c": [
+				{
+					"c": "nichtdokumentierte Closedsource-Bibliothek (jar)",
+					"s": "Reverse engineering"
+				}
+			],
+			"plattformen": ["Android"],
+			"auftraggeber": "Firma in Manchester (NDA)"
+		}, {
+			"projekt": "Eppendorf",
+			"inhalt": ["Katalog", "Vertriebsnetz", "Tools", "YoutubeChannel", "Augmented Reality", "360°-Bilder"],
+			"technik": "Titanium",
+			"layoutdesign": "Eigenentwicklung",
+			"rolle": "Konzeption, Umsetzung",
+			"herausforderungen": [
+				{
+					"c": "Backendperformanz",
+					"s": "Synchronisierung einer im Backend erzeugten SQLite-DB"
+				}, {
+					"c": "komplexes Layout und Gerätevielfalt",
+					"s": "spezieller Rendering-Algorithmus"
+				}, {
+					"c": "Blätterlayout",
+					"s": "Programmierung nativer Komponenten für iOS und Android"
+				}
+			],
+			"auftraggeber": "eppendorf AG",
+			"plattformen": ["iOS, Android"]
+		}, {
+			"projekt": "Ventra Chicago",
+			"inhalt": "TicketApp für den ÖPNV in Chicago",
+			"technik": "ReactNative",
+			"layoutdesign": "Kundenvorgabe",
+			"rolle": "Teil eines Scrumteams. Cardmanager, Tripplanner, Transittracker",
+			"herausforderungen": [
+				{
+					"c": "Internationales Team (Hamburg, Texas, Indien)",
+					"s": "Videokonferenzen"
+				}, {
+					"c": "rascher Versionswechsel bei ReaktNative",
+					"s": "smarte Versionspolitik"
+				}
+			],
+			"auftraggeber": "Cubic Transportation GmbH",
+			"plattformen": ["iOS, Android"]
+		}, {
+			"projekt": "Finanzassistent",
+			"inhalt": "Homebanking- und CRM-App",
+			"layoutdesign": "Beratung des Kunden",
+			"technik": "Titanium",
+			"rolle": "Workshop mit dem Team aus Köln, danach Beratung und Modulentwicklung",
+			"herausforderungen": [
+				{
+					"c": "Personalexpertise",
+					"s": "Schulung und Workshop vor Ort"
+				}, {
+					"c": "Hohe Sicherheitsstandards"
+				}, {
+					"c": "lokale Generierung von PDFs auf dem Gerät",
+					"s": "Schaffung einnes PDF-Plugins in Javascript"
+				}
+			],
+			"auftraggeber": "Größter deutscher Finanzdienstleister (NDA)",
+			"plattformen": ["iOS, Android"]
+		}, {
+			"projekt": "Timetrip Pics",
+			"inhalt": "EU-geförderte App zur Darstellung historischer Stadtansichten in Tirol",
+			"technik": "Titanium",
+			"layoutdesign": "Kundenvorgabe",
+			"rolle": "Konzeption, Umsetzung nach Layoutvorgaben",
+			"herausforderungen": [
+				{
+					"c": "Backend über Googles Firebase",
+					"s": "Programmierung eines Adapters"
+				}, {
+					"c": "Kameraview als Bestandteil einer View",
+					"s": "Programmierung eines nativen Plugins"
+				}, {
+					"c": "360°-VR-View",
+					"s": "Programmierung eines nativen Plugins mit C++-Bestandteilen"
+				}, {
+					"c": "Kompassview für stilisierten Stadtplan",
+					"s": "Programmierung eines nativen Plugins"
+				}, {
+					"c": "Sehr viele (>500) Assets (Bilder und Audiodateien) und Vorgabe de 100prozentigen Offlinbebetriebes",
+					"s": "Downloadmanager"
+				}
+			],
+			"auftraggeber": "Realer Bruneck (Südtirol)",
+			"plattformen": ["iOS, Android"]
+		}
+	]
+}

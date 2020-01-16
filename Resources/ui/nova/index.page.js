@@ -94,7 +94,7 @@ module.exports = function(_args) {
 		for (var ndx = 0; ndx < PAGES; ndx++) {
 			require('controls/nova/adapter')(ndx, "thema", function(_sendungen, _ndx) {
 				//$.refreshView.setRefreshing(false);
-				$.mainlist.sections[_ndx].setItems(require("ui/nova/index.row")(_sendungen));
+				$.mainlist.sections[_ndx].items=require("ui/nova/index.row")(_sendungen);
 			});
 		}
 	};

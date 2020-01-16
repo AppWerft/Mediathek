@@ -2,6 +2,7 @@ var Moment = require('vendor/moment'),
     Favs = new (require('controls/favorites.adapter'))();
 const Global = require('global');
 
+
 module.exports = function(_args) {
 	/*if (_args.station != Global.currentStation) {
 			console.log('Warning: no same station');
@@ -57,6 +58,7 @@ module.exports = function(_args) {
 	};
 
 	var url = (_args.date) ? _args.url.replace(/_DATE_/gm, _args.date) : _args.url;
+	
 	if (!_args.nocache && Ti.App.Properties.hasProperty(url)) {
 		_args.onload(JSON.parse(Ti.App.Properties.getString(url)));
 		return null;

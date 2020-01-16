@@ -91,14 +91,8 @@ function onPlayerChange(_e) {
 function onMetaData(_event) {
     var message = _event.title;
     if (currentStation.station != 'drw') {
-        Dayplan.getCurrentOnAir(currentStation.station,item => {
-            if (item.progress != undefined) {
-                Notification.setProgress(item.progress.replace('%', '') / 100);
-            }
-        });
+       
     }
-    Notification.setSubtitle(message);
-    Notification.setTitle(currentStation.title);
     if (callbackFn && typeof callbackFn == 'function')
         callbackFn({
             message : message,
@@ -127,6 +121,7 @@ exports.init = function(lifecycleContainer, icon) {
         icon : 'smallicon',
         progress : 0.0,
         title : currentStation.title,
+         subtitle : currentStation.subtitle,
         image : currentStation.largeIcon
     });
     LOG("notification initialized");
@@ -144,6 +139,7 @@ exports.play = function(station, _callbackFn) {
 
     if (currentStation.url != undefined && typeof currentStation.url == 'string') {
         if (Notification) {
+           
             LOG('STATIONTITLE:' + currentStation.title);
             LOG(currentStation);
             Notification.setTitle(currentStation.title);
