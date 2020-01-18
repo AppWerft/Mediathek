@@ -4,6 +4,7 @@ const Moment = require('vendor/moment');
 module.exports = function(parent) {
     const $ = Ti.UI.createScrollView({
         backgroundColor : lila,
+        zIndex:999,
         layout : 'vertical',
         scrollType : 'vertical'
 
@@ -51,14 +52,7 @@ module.exports = function(parent) {
             fontWeight : 'bold'
         }
     });
-    burgerIcon.addEventListener('click', () => {
-        Ti.UI.createNavigationWindow({
-            window : require('ui/archive/index.window')(),
-            theme : "Theme.AppCompat.Light.DarkActionBar",
-        }).open();
-
-    });
-    $.searchRow.add(burgerIcon);
+    
 
     $.add($.searchRow);
 

@@ -198,6 +198,7 @@ $.prototype = {
             }
 
             // global in this method for dlm callback
+            console.log(props);
             link.execute('INSERT OR REPLACE INTO recents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', //
             this.url, //
             this.localfilename, props.image, //
@@ -243,33 +244,7 @@ $.prototype = {
     isComplete : function() {
         return true;
     },
-    getAllRecents : function() {
-        var link = Ti.Database.open(DB);
-        var recents = [];
-        var res = link.execute('SELECT * FROM recents WHERE progress <= duration ORDER BY DATETIME(lastaccess) DESC');
-        while (res.isValidRow()) {
-            var station = res.getFieldByName('station');
-            recents.push({
-                url : res.getFieldByName('url'),
-                image : '/images/' + station + '.png',
-                station : station,
-                title : res.getFieldByName('sendung'),
-                subtitle : res.getFieldByName('title'),
-                duration : res.getFieldByName('duration'),
-                progress : res.getFieldByName('progress') / res.getFieldByName('duration'),
-                lastaccess : res.getFieldByName('lastaccess'),
-                pubdate : res.getFieldByName('pubdate'),
-                author : res.getFieldByName('author'),
-                color : (station ) ? Model[station].color : 'gray'
-            });
-            res.next();
-        }
-
-        res.close();
-        link.close();
-        return recents;
-    },
-
+    
     fireEvent : function(_event, _payload) {
         if (this.eventhandlers[_event]) {
             for (var i = 0; i < this.eventhandlers[_event].length; i++) {
@@ -292,6 +267,39 @@ $.prototype = {
     }
 };
 
+/* static method */
+const getAllRecents = function() {
+        var link = Ti.Database.open(DB);
+        var recents = [];
+        var res = link.execute('SELECT * FROM recents WHERE progress <= duration ORDER BY DATETIME(lastaccess) DESC');
+        while (res.isValidRow()) {
+            var station = res.getFieldByName('station');
+            var progress = res.getFieldByName('progress') / res.getFieldByName('duration');
+            if (!progress) progress=1;
+            recents.push({
+                url : res.getFieldByName('url'),
+                image : '/images/' + station + '.png',
+                station : station,
+                title : res.getFieldByName('sendung'),
+                subtitle : res.getFieldByName('title'),
+                author : res.getFieldByName('author'),
+                duration : res.getFieldByName('duration'),
+                progress : progress,
+                lastaccess : res.getFieldByName('lastaccess'),
+                pubdate : res.getFieldByName('pubdate'),
+                author : res.getFieldByName('author'),
+                color : (station ) ? Model[station].color : 'gray'
+            });
+            res.next();
+        }
+
+        res.close();
+        link.close();
+        return recents;
+};
+
+
 exports.createFileCache = function(station, url) {
     return new $(station, url);
 };
+exports.getAllRecents = getAllRecents;

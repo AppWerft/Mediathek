@@ -14,22 +14,22 @@ const Streamer = require('liveradio/audiostreamer.adapter');
 
 module.exports = function(station) {
     var onAir;
-    console.log("////////////////////Aod.createPreviewdata ");
+    
     console.log(station);
     if (station.id) {
+        console.log("////////////////////Aod.createPreviewdata ");
         onAir = Aod.createPreviewdata({
             station : station.id
         });
-        onAir.start({
+        /*onAir.start({
             interval : 2000,
             onload : function(broadcast) {
-                console.log(broadcast);
+                //console.log(broadcast);
             }
-        });
+        });*/
     }
     // // START /////
     var $ = Ti.UI.createWindow({
-        //modal : true,
         station : station,
         backgroundColor : '#8000',
         theme : 'Theme.AppCompat.Translucent.NoTitleBar.Fullscreen'

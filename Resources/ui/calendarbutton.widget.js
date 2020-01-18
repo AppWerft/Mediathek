@@ -22,7 +22,7 @@ module.exports = function(parent, cb) {
     const currentDate = parent.date;
     const $ = Draggable.createView({
         width : 64,
-        bottom : 20,
+        bottom : 60,
         right : 20,
         touchFeedback : true,
         touchFeedbackColor : "#808080",

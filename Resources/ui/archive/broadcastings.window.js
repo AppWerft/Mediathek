@@ -7,7 +7,7 @@ Gears = require('ui/gears.widget')();
 Gears.bottom = 0;
 Gears.left = 0;
 
-module.exports = function(navwindow,broadcast) {
+module.exports = function(broadcast) {
     const id = broadcast.id;
     const title = broadcast.title;
     var total = 0;
@@ -30,7 +30,10 @@ module.exports = function(navwindow,broadcast) {
             };
 
             activity.actionBar.onHomeIconItemSelected = function() {
-                $.navigationWindow.closeWindow($);
+                if ($.navigationWindow)
+                    $.navigationWindow.closeWindow($);
+                else
+                    $.close();
             };
             activity.invalidateOptionsMenu();
         } else
@@ -68,7 +71,7 @@ module.exports = function(navwindow,broadcast) {
                     $.menuItem.expandActionView();
 
                 }));
-          АктйонБар.setSubtitle( title + ': ' + total + ' Beiträge');
+            АктйонБар.setSubtitle(title + ': ' + total + ' Beiträge');
             var items = [];
             var sectionIndex = _res.page - 1;
             _res.items.forEach(function(item) {
@@ -106,15 +109,15 @@ module.exports = function(navwindow,broadcast) {
 
         } else {
             var dialog = Ti.UI.createAlertDialog({
-                message: "Im Bereich " + title + " werden zur Zeit keine Beiträge bereitgestellt",
-                ok: 'Ok',
-                title: title
+                message : "Im Bereich " + title + " werden zur Zeit keine Beiträge bereitgestellt",
+                ok : 'Ok',
+                title : title
             });
             dialog.show();
-            dialog.addEventListener("click",function(){
-                 $.navigationWindow.closeWindow($);
+            dialog.addEventListener("click", function() {
+                $.close();
             });
-        }    
+        }
     };
     Filter(id, 1, setDataintoSectionFn);
     var $ = Ti.UI.createWindow({

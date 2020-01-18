@@ -1,71 +1,51 @@
-const Global = require('global');
-const FlipModule = require('de.manumaticx.androidflip'); 
-const Aod = require('ti.aod');
-
-
 ! function() {
-    Aod.init();
+    const Global = require('global'),
+        Aod = require('ti.aod');
+    ;
     const $ = Ti.UI.createWindow({
-       // fullscreen : true,
-        navBarHidden: false,
-         theme : "Theme.AppCompat.Light.DarkActionBar"
+        navBarHidden : false,
+        theme : "Theme.AppCompat.Light.DarkActionBar",
+        liveData : null
     });
-    
-    $.addEventListener('open',require('ui/main.menu'));
-     var pages = [];
-     for (var station in Global.Stations) {
-            const opts = {
-                station : station,
-                window : $,
-                color : Global.Stations[station].color,
-                mediathek : Global.Stations[station].mediathek,
-            };
-            if (station != 'drw')
-                pages.push(require('ui/mediathek.page')(opts));
-            else
-                pages.push(require('ui/nova/index.page')(opts));
+
+    if (Ti.Network.online) {
+        $.liveData = Aod.createPreviewdata({
+            station : Global.Stations[Global.currentStation].id
+        });
+        $.liveData.onLoad = function(res) {
+            Global.АктйонБар.subtitle = res.start + "  " + res.title;
+            Global.АктйонБар.title = Global.Stations[Global.currentStation].name;
         };
-        $.Drawer = Ti.UI.Android.createDrawerLayout({
-            leftView : require('ui/drawer/leftdrawer.widget')($),
-            //rightView : require('ui/drawer/rightdrawer.widget')(),
-            
-            centerView : FlipModule.createFlipView({
-                orientation : FlipModule.ORIENTATION_HORIZONTAL,
-                overFlipMode : FlipModule.OVERFLIPMODE_GLOW,
-                views : pages,
-                top : 0,
-                bottom : 0,
-                currentPage : Global.currentPage,
-                height : Ti.UI.FILL
-            })
-        });
-        $.Drawer.centerView.addEventListener('flipped', function(e) {
-            Object.keys(Global.Stations).forEach((k,i) => {
-                if (i == e.index) {
-                    Global.currentStation = k;
-                }
+    }
+
+    $.addEventListener('open', require('ui/main.menu'));
+
+    // livecycles:
+    $.addEventListener('focus', function() {
+        if ($.liveData) {
+            $.liveData.start({
+                interval : 10000,
             });
-        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
-        Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
-        Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
-        Global.АктйонБар.statusbarColor = Global.Stations[Global.currentStation].darkcolor;
-      
-             Ti.App.Properties.setString('LAST_STATION', Global.currentStation);
-        });
-        $.Drawer.centerView.flipToView($.Drawer.centerView.views[Global.currentPage]);
-       
-        const repeating = Ti.App.Properties.hasProperty("LL");
-        if (Global.currentPage < 2)
-            $.Drawer.centerView.peakNext(repeating);
-        else
-            $.Drawer.centerView.peakPrevious(repeating);
-        $.add($.Drawer);
-       
-         Ti.App.Properties.setBool("LL",true);   
-   // });
+
+        }
+    });
+    $.addEventListener('blur', function() {
+        $.liveData && $.liveData.stop();
+    });
+
+    $.Drawer = Ti.UI.Android.createDrawerLayout({
+        leftView : require('ui/drawer/leftdrawer.widget')($),
+        rightView : require('ui/drawer/rightdrawer.widget')($),
+        bottom : 0,
+        centerView : require('ui/flipview')($),
+    });
+    $.Drawer.addEventListener("change", $.Drawer.rightView.render);
+   
+
+    $.add($.Drawer);
+
     $.open();
     $.createAndStartPlayer = function(_args) {
         require('ui/audioplayer.window').createAndStartPlayer(_args);
     };
-    
 }();

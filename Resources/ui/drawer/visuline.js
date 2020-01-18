@@ -17,7 +17,7 @@ module.exports = function() {
           enabled : true,
         value : Settings.get(KEY)
     }));
-    $.children[1].addEventListener("change", e => {
+    $.children[1].addEventListener("change", function(e) {
         Settings.set(KEY, e.value);
     });
     return $;

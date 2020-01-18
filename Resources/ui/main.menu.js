@@ -1,9 +1,8 @@
-const Global = require('global');
-const OnlineState = require("vendor/online.state");
+const Global = require('global'),
+    OnlineState = require("vendor/online.state");
 
 module.exports = function(_event) {
-    Global.АктйонБар.title = "Deutschlandfunk Mediathek";
-    Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
+    Global.АктйонБар.title = "DLF Mediathek";
     Global.АктйонБар.backgroundColor = Global.Stations[Global.currentStation].color;
     Global.АктйонБар.subtitle = Global.Stations[Global.currentStation].name;
     Global.АктйонБар.statusbarColor = Global.Stations[Global.currentStation].darkcolor;
@@ -21,7 +20,8 @@ module.exports = function(_event) {
                     name : Global.Stations[Global.currentStation].name,
                     color : Global.Stations[Global.currentStation].color,
                     stream : Global.Stations[Global.currentStation].stream,
-                    station : Global.currentStation
+                    station : Global.currentStation,
+                    id : Global.Stations[Global.currentStation].id,
                 };
                 require('liveradio/radioplayer.window')(station).open();
             });
@@ -58,13 +58,15 @@ module.exports = function(_event) {
                 title : 'Captive Portal'
             });
             break;
+        case OnlineState.ONLINE:
+            require('ti.aod').init();
+            break;
         }
         if (dialog) {
             dialog.show();
-            dialog.addEventListener('click',function(){
+            dialog.addEventListener('click', function() {
                 _event.source.close();
             });
         }
     });
-
 };
