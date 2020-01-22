@@ -86,6 +86,7 @@ var $ = function(props) {
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
         text : props.subtitle,
+        transitionName : 'subtitle',
         font : {
             fontSize : (props.image) ? 34 : 48,
             fontFamily : 'ScalaSansBold'
@@ -100,6 +101,7 @@ var $ = function(props) {
         color : 'white',
         width : Ti.UI.FILL,
         height : Ti.UI.SIZE,
+         transitionName : 'author',
         font : {
             fontSize : 24,
             fontStyle : 'italic',

@@ -6,7 +6,7 @@ module.exports = function(station) {
             'archive' : require('TEMPLATES').archive,
         },
         defaultItemTemplate : 'archive',
-        backgroundColor : 'transparent',
+        backgroundColor : 'white',
         sections : []
     });
     const onitemclickFn = (event) => {

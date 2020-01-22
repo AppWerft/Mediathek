@@ -9,17 +9,30 @@
     });
 
     if (Ti.Network.online) {
-        $.liveData = Aod.createPreviewdata({
+        $.liveData = Aod.createLivedata({
             station : Global.Stations[Global.currentStation].id
         });
         $.liveData.onLoad = function(res) {
-            Global.АктйонБар.subtitle = res.start + "  " + res.title;
+            Global.АктйонБар.subtitle = res.startText + "  " + res.title;
             Global.АктйонБар.title = Global.Stations[Global.currentStation].name;
         };
     }
 
     $.addEventListener('open', require('ui/main.menu'));
-
+    $.addEventListener('open', function() {
+        const OCR = require("ti.ocrvision");
+        console.log("/////////////////////// OCR /////////////////////////////////");
+        console.log("isGooglePlayServicesAvailable " + OCR.isGooglePlayServicesAvailable() + " version: " + OCR.GOOGLE_PLAY_SERVICES_VERSION_CODE);
+        console.log("isOperational " + OCR.isOperational());
+        console.log("hasCameraPermissions "+Ti.Media.hasCameraPermissions());
+        $.add(OCR.createCameraview({
+            top : 50,
+            height : '50%',
+            lifecycleContainer : $,
+            borderRadius:50
+            
+        }));
+    });
     // livecycles:
     $.addEventListener('focus', function() {
         if ($.liveData) {
@@ -40,7 +53,6 @@
         centerView : require('ui/flipview')($),
     });
     $.Drawer.addEventListener("change", $.Drawer.rightView.render);
-   
 
     $.add($.Drawer);
 

@@ -12,7 +12,6 @@ module.exports = function(_args) {
 	var onloadFunc = function() {
 		var start = new Date().getTime();
 		var entries = require('controls/aodlistaudio.rpc').parseXMLDoc(this.responseXML.documentElement);
-		console.log('Info: time for mediathekparsing= ' + (new Date().getTime() - start) + '  ' + entries.length + ' Beiträge');
 		var result = {
 			hash : Ti.Utils.md5HexDigest(this.responseText),
 			live : entries
@@ -33,7 +32,7 @@ module.exports = function(_args) {
 					url : item.url,
 					deliveryMode: item.deliveryMode,
 					datetime : item.datetime,
-					pubdate : item.datetime,
+					pubdate : item.datetime.replace(' Uhr',''),
 					duration : item.duration,
 					//	id : item.sendung.id,
 					title : item.title,

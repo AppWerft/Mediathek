@@ -74,7 +74,7 @@ module.exports = function(window) {
                         text : "Letztzugriff: " + Moment(item.lastaccess).format("LLL") + ' Uhr'
                     },
                     pubdate : {
-                        text : "Sendezeit: " + Moment(item.pubdate).format("LLL").replace("Invalid date", "unklar…")
+                        text : "Sendezeit: " + Moment(item.pubdate).format("LLL").replace("Invalid date", "unklar…") + ' Uhr'
                     },
                     image : {
                         image : item.image,

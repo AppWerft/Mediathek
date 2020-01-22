@@ -5,7 +5,6 @@ const parseNode = function(itemNode) {
 		title : itemNode.getElementsByTagName('title').item(0).getTextContent(),
 		author : itemNode.getElementsByTagName('author').item(0).getTextContent(),
 		sendung : itemNode.getElementsByTagName('sendung').item(0).getTextContent(),
-		
 		datetime : itemNode.getElementsByTagName('datetime').item(0).getTextContent(),
 	};
 	if (itemNode.hasAttributes()) {

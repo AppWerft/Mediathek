@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.16
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
+description: OCRvision
+author: Rainer Knoeterich
+license: Specify your license
+copyright: Copyright (c) 2020 by Your Company
+
+# these should not be edited
+name: Ocrvision
+moduleid: ti.ocrvision
+guid: 768f4b93-1991-49f0-9c2c-e53b5b3d2c96
+platform: android
+minsdk: 8.0.0

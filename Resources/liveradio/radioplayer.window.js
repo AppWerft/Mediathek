@@ -15,18 +15,13 @@ const Streamer = require('liveradio/audiostreamer.adapter');
 module.exports = function(station) {
     var onAir;
     
-    console.log(station);
+   
     if (station.id) {
         console.log("////////////////////Aod.createPreviewdata ");
-        onAir = Aod.createPreviewdata({
+        onAir = Aod.createLivedata({
             station : station.id
         });
-        /*onAir.start({
-            interval : 2000,
-            onload : function(broadcast) {
-                //console.log(broadcast);
-            }
-        });*/
+        
     }
     // // START /////
     var $ = Ti.UI.createWindow({
@@ -37,10 +32,17 @@ module.exports = function(station) {
 
     $.addEventListener('blur', function() {
         $.active = false;
+        onAir.stop();
         console.log("RadioPlayer goes into PAUSE");
     });
     $.addEventListener('focus', function() {
         $.active = true;
+        onAir.start({
+            interval : 20000,
+            onload : function(broadcast) {
+                console.log(broadcast);
+            }
+        });
         console.log("RadioPlayer goes into RESUME");
 
     });

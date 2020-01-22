@@ -198,7 +198,12 @@ $.prototype = {
             }
 
             // global in this method for dlm callback
-            console.log(props);
+            if (props.pubdate.indexOf("Uhr")>-1) {
+                var pubdate = Moment(props.pubdate.replace(" Uhr",""),"DD.MM.YYYY HH:mm");
+            } else 
+            var pubdate = Moment(props.pubdate);
+            console.log( "🧯'" +  props.pubdate + "'   " +  pubdate.toISOString());
+           
             link.execute('INSERT OR REPLACE INTO recents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', //
             this.url, //
             this.localfilename, props.image, //
@@ -208,7 +213,7 @@ $.prototype = {
             props.duration, //
             0, //
             Moment().toISOString(), // lastaccess
-            Moment(props.pubdate).toISOString(), // pubdate
+            pubdate.toISOString(), // pubdate
             props.author, //
             0, 0, 0, 0, props.deliveryMode);
             link.close();

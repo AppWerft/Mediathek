@@ -21,7 +21,7 @@ module.exports = function(_args) {
     Ti.App.addEventListener('daychanged', function() {
         $.date = Moment().startOf('day');
     });
-    
+
     $.mainList = Ti.UI.createListView({
         backgroundColor : _args.color,
         templates : {
@@ -112,7 +112,6 @@ module.exports = function(_args) {
         });
     };
 
-   
     var locked = false;
     var onitemclickFunc = function(_e) {
         var start = new Date().getTime();
@@ -140,10 +139,17 @@ module.exports = function(_args) {
                 });
             });
         } else if (_e.bindId && _e.bindId == 'playtrigger') {
-
+            _args.window.removeAllSharedElements();
             var data = JSON.parse(_e.itemId);
             if (Settings.get("VIBRATION"))
                 Ti.Media.vibrate([1, 1]);
+           
+            /*var item = _e.section.getItemAt(_e.itemIndex);
+            item.childTemplates[3].childTemplates[0].transitionName="subtitle";
+            item.childTemplates[3].childTemplates[1].transitionName="author";
+            _e.section.updateItemAt(_e.itemIndex, item);
+            */
+            //_args.addSharedElement(titleInWinA, "subtitle");
             _args.window.createAndStartPlayer({
                 color : _args.color,
                 url : data.url,

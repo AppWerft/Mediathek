@@ -90,16 +90,14 @@ exports.schema = {
 
 exports.archive = {
     properties : {
-        height : 40,
+        height : 50,
         backgroundColor : 'white',
         itemId : ''
     },
     childTemplates : [{
         type : 'Ti.UI.Label',
         bindId : 'title',
-
         properties : {
-
             font : {
                 fontSize : 16,
                 fontFamily : 'Aller Bold'
@@ -371,6 +369,7 @@ exports.mediathek = {
             properties : {
                 left : 0,
                 top : 5,
+                transitionName :'subtitle',
                 touchEnabled : false,
                 font : {
                     fontSize : 20,
@@ -384,8 +383,8 @@ exports.mediathek = {
             bindId : 'autor',
             properties : {
                 left : 0,
+                transitionName :'author',
                 top : 5,
-
                 height : Ti.UI.SIZE,
                 touchEnabled : false,
                 font : {
@@ -929,6 +928,20 @@ exports.recents = {
             }
         }, {
             type : 'Ti.UI.Label',
+            bindId : 'sendung',
+            properties : {
+                left : 0,
+                top : 5,
+                height : Ti.UI.SIZE,
+                touchEnabled : false,
+                font : {
+                    fontSize : 16,
+                    fontFamily : 'Aller Bold'
+                },
+                color : '#555'
+            }
+        }, {
+            type : 'Ti.UI.Label',
             bindId : 'author',
             properties : {
                 left : 0,
@@ -971,21 +984,7 @@ exports.recents = {
                 },
                 color : '#333'
             }
-        }, {
-            type : 'Ti.UI.Label',
-            bindId : 'sendung',
-            properties : {
-                left : 0,
-                top : 5,
-                height : Ti.UI.SIZE,
-                touchEnabled : false,
-                font : {
-                    fontSize : 16,
-                    fontFamily : 'Aller Bold'
-                },
-                color : '#555'
-            }
-        }, {
+        },  {
             type : 'Ti.UI.Label',
             bindId : 'message',
             properties : {
